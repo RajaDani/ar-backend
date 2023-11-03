@@ -1,0 +1,31 @@
+{
+  "environment": "local",
+  "app": {
+    "domain": "localhost",
+    "cookie_domain": "localhost"
+  },
+  "server": {
+    "version": "1.0",
+    "name": "CRUD",
+    "host": "0.0.0.0",
+    "port": 9000,
+    "ssl": false
+  },
+  "fastify": {
+    "log_level": "trace"
+  },
+  "jwt": {
+    "secret": "d423582af62-5e0432-42g3-9805-ec8e234fds45"
+  },
+  "dbConfig": {
+    "host": "localhost",
+    "port": 3306,
+    "username": "root",
+    "password": "",
+    "database": "arhomeservices",
+    "dialect": "mysql"
+  },
+  "encryption": {
+    "key": "d423582a4adasd-34627-fsdfsd45435dss-455ffd5"
+  }
+}
