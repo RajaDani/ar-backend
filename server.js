@@ -1,2 +1,2 @@
-const Application = require("./src/app");
+const Application = require("./functions/app");
 Application.bootstrap(process);
