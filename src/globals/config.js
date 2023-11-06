@@ -5,12 +5,11 @@ nconf.env().argv();
 
 const env = nconf.get("benv");
 
-// console.log(
-//   "Loaded Config File >",
-//   path.join(__dirname, "../env", `local.json`)
-// );
+console.log(
+    "Loaded Config File >",
+    path.join(__dirname, "../env", `${env}.json`)
+);
 
-// nconf.file({ file: path.join(__dirname, "../env", `local.json`) });
-nconf.file({ file: "../env/local.json" });
+nconf.file({ file: path.join(__dirname, "../env", `${env}.json`) });
 
 module.exports = nconf;

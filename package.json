@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "vercel": "vercel dev"
+    "local": "nodemon server.js --benv local"
   },
   "repository": {
     "type": "git",
@@ -17,11 +17,7 @@
     "url": "https://github.com/RajaDani/ar-backend/issues"
   },
   "homepage": "https://github.com/RajaDani/ar-backend#readme",
-  "devDependencies": {
-    "@vercel/node": "^2.15.8"
-  },
   "dependencies": {
-    "dotenv": "^16.3.1",
     "@fastify/cors": "^8.3.0",
     "awilix": "^8.0.1",
     "cloudinary": "^1.40.0",
