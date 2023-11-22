@@ -8,6 +8,7 @@ const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
 const sequelizeCon = require("../adapter/sequelize");
 const cloudinary = require('cloudinary');
+const Boom = require("boom")
 
 module.exports = async function FastDI(options = {}) {
   const logger = _.get(options, "logger", undefined);
@@ -36,6 +37,7 @@ module.exports = async function FastDI(options = {}) {
     sequelizeCon: awilix.asValue(sequelizeCon),
     Op: awilix.asValue(Op),
     cloudinary: awilix.asValue(cloudinary),
+    Boom: awilix.asValue(Boom),
   });
 
   container.loadModules(

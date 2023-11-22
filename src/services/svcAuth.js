@@ -5,6 +5,7 @@ module.exports = function svcAuth(opts) {
     mdlAdmin,
     encryption,
     config,
+    Boom,
     mdlCustomerAddress,
   } = opts;
   const { User } = mdlUser;
@@ -15,9 +16,9 @@ module.exports = function svcAuth(opts) {
     const { name, email, password, contact, address_details, lat, lng } =
       params;
     const emailCheck = await User.count({ where: { email } });
-    if (emailCheck > 0) return { code: 500, msg: "Email already exists!" };
+    if (emailCheck > 0) Boom.conflict("Email already exists!");
     const contactCheck = await User.count({ where: { contact } });
-    if (contactCheck > 0) return { code: 500, msg: "Contact already exists!" };
+    if (contactCheck > 0) Boom.conflict("Contact already exists!");
     const pass = encryption.hashPassword(password, config);
     const token = await encryption.generateToken(params);
     if (token) {
@@ -42,7 +43,7 @@ module.exports = function svcAuth(opts) {
   async function createAdmin(params) {
     const { name, email, password, contact, address_details, modules } = params;
     const count = await Admin.count({ where: { email: email } });
-    if (count > 0) return { code: 200, msg: "Email already exists!" };
+    if (count > 0) Boom.conflict("Email already exists!");
     const pass = encryption.hashPassword(password, config);
     const token = await encryption.generateToken(params);
     if (token) {
@@ -63,64 +64,57 @@ module.exports = function svcAuth(opts) {
   async function verifyUser(params) {
     const { email, password } = params;
     const pass = encryption.hashPassword(password, config);
-    try {
-      const user = await User.findOne({
-        where: {
-          email: email,
-          password: pass,
-        },
-        include: [{
-          model: CustomerAddress,
-          attributes: ["address_details"]
-        }],
-        // raw: true
-      });
-      if (!user) return { msg: "Incorrect username or password!" };
 
-      const token = await encryption.generateToken(user);
-      if (token)
-        return {
-          msg: "success",
-          token,
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          contact: user.contact,
-          address: user.customer_addresses[0].address_details
-        };
-    } catch (error) {
-      return { code: 500, msg: "Something went wrong" };
-    }
+    const user = await User.findOne({
+      where: {
+        email: email,
+        password: pass,
+      },
+      include: [{
+        model: CustomerAddress,
+        attributes: ["address_details"]
+      }],
+    });
+    if (!user) throw Boom.conflict("Incorrect email or password")
+    const token = await encryption.generateToken(user);
+    if (token)
+      return {
+        msg: "success",
+        token,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        contact: user.contact,
+        address: user.customer_addresses[0].address_details
+
+      }
+
   }
 
   async function verifyAdmin(params) {
     const { email, password } = params;
     const pass = await encryption.hashPassword(password, config);
+    const admin = await Admin.findOne({
+      where: {
+        email,
+        password: pass,
+      },
+    });
+    if (!admin) Boom.conflict("Incorrect username or password!");
 
-    try {
-      const admin = await Admin.findOne({
-        where: {
-          email,
-          password: pass,
-        },
-      });
-      if (!admin) return { msg: "Incorrect username or password!" };
-
-      const token = await encryption.generateAdminToken(admin);
-      if (token) {
-        const data = {
-          adminToken: token,
-          name: admin.name,
-          email: admin.email,
-          modules: admin.modules,
-          contact: admin.contact,
-          admin_type: admin.admin_type,
-        };
-        return { msg: "success", data };
-      }
-    } catch (error) {
-      return { code: 500, msg: "Something went wrong" };
+    const token = await encryption.generateAdminToken(admin);
+    if (token) {
+      const data = {
+        adminToken: token,
+        name: admin.name,
+        email: admin.email,
+        modules: admin.modules,
+        contact: admin.contact,
+        admin_type: admin.admin_type,
+      };
+      return { msg: "success", data };
     }
+
   }
 
   return {

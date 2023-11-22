@@ -1,6 +1,6 @@
 module.exports = function svcUser(opts) {
   const { sequelizeCon, sequelize, mdlUser, mdlOrder, mdlItem,
-    mdlAppointment, mdlCustomerAddress, encryption, config, mdlCity } =
+    mdlAppointment, mdlCustomerAddress, encryption, config, mdlCity, Boom } =
     opts;
   const { User } = mdlUser;
   const { Order } = mdlOrder;
@@ -195,7 +195,7 @@ module.exports = function svcUser(opts) {
       }
     })
 
-    if (!userPass) return { code: 500, reply: "Current password is incorrect!" }
+    if (!userPass) Boom.conflict("Current password is incorrect!");
     const pass = encryption.hashPassword(new_password, config);
     const user = await User.update(
       { password: pass },
