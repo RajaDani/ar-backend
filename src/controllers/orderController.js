@@ -28,6 +28,12 @@ module.exports = function orderController(opts) {
         reply.send({ code: 200, reply: record });
     }
 
+    async function quickUpdateOrder(request, reply) {
+        const { params, body } = request;
+        const record = await svcOrder.quickUpdateOrder(params, body);
+        reply.send({ code: 200, reply: record });
+    }
+
     async function deleteOrderByID(request, reply) {
         const record = await svcOrder.deleteOrderByID(request.params);
         reply.send({ code: 200, reply: record });
@@ -39,6 +45,7 @@ module.exports = function orderController(opts) {
         searchOrders,
         addOrder,
         updateOrder,
+        quickUpdateOrder,
         deleteOrderByID
     };
 };

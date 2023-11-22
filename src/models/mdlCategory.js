@@ -12,6 +12,10 @@ module.exports = function mdlUser(opts) {
       type: sequelize.STRING,
       allowNull: false,
     },
+    display_title: {
+      type: sequelize.STRING,
+      allowNull: false,
+    },
     description: {
       type: sequelize.STRING,
       allowNull: true,

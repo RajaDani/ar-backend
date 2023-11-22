@@ -13,6 +13,8 @@ module.exports = function svcItem(opts) {
         "image_url",
         "price",
         "old_price",
+        "variation_data",
+        "item_type",
         "rating",
         "featured",
       ],
@@ -98,14 +100,23 @@ module.exports = function svcItem(opts) {
   }
 
   async function getItemsBySubcategoryAndBusiness(params) {
-    const { subCategoryId, businessId } = params
+    const { subCategoryId, businessId } = params;
     const items = await Item.findAll({
-      attributes: ["id", "name", "image_url", "price", "old_price",
-        "rating", "featured", "item_type", "variation_data"],
+      attributes: [
+        "id",
+        "name",
+        "image_url",
+        "price",
+        "old_price",
+        "rating",
+        "featured",
+        "item_type",
+        "variation_data",
+      ],
       where: {
         status: 1,
         subcategory_id: subCategoryId,
-        business_id: businessId
+        business_id: businessId,
       },
     });
     return items;
@@ -141,8 +152,16 @@ module.exports = function svcItem(opts) {
   async function getItemsByBusiness(params) {
     const { businessId } = params;
     const item = await Item.findAll({
-      attributes: ["id", "name", "price", "image_url", "description", "item_type",
-        "variation_data", "rating"],
+      attributes: [
+        "id",
+        "name",
+        "price",
+        "image_url",
+        "description",
+        "item_type",
+        "variation_data",
+        "rating",
+      ],
       where: {
         business_id: businessId,
       },

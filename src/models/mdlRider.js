@@ -1,5 +1,7 @@
 module.exports = function mdlRider(opts) {
-  const { sequelize, sequelizeCon } = opts;
+  const { sequelize, sequelizeCon, mdlCity } = opts;
+
+  const { City } = mdlCity;
 
   const Rider = sequelizeCon.define("rider", {
     id: {
@@ -37,6 +39,9 @@ module.exports = function mdlRider(opts) {
       defaultValue: true,
     },
   });
+
+  Rider.belongsTo(City, { foreignKey: "city_id" });
+
   return { Rider };
 };
 

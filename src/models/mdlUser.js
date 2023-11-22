@@ -1,5 +1,7 @@
 module.exports = function mdlUser(opts) {
-  const { sequelize, sequelizeCon } = opts;
+  const { sequelize, sequelizeCon, mdlCity } = opts;
+
+  const { City } = mdlCity;
 
   const User = sequelizeCon.define("customer", {
     id: {
@@ -29,6 +31,8 @@ module.exports = function mdlUser(opts) {
       defaultValue: true,
     },
   });
+
+  User.belongsTo(City, { foreignKey: "city_id" });
 
   return {
     User,

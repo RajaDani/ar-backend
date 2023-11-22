@@ -16,7 +16,7 @@ module.exports = function Encryption(opts) {
       { name: data.name, email: data.email, id: data.id, role: "client" },
       privateKey,
       {
-        expiresIn: "7d",
+        expiresIn: "30d",
       }
     );
     if (token) return token;

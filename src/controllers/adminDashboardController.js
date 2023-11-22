@@ -21,5 +21,8 @@ module.exports = function areaController(opts) {
         reply.send({ code: 200, reply: record });
     }
 
-    return { getDashboardAnalytics, getOrdersByCity, getOrdersByWeek, getLatestTransactions };
+    return {
+        getDashboardAnalytics, getOrdersByCity, getOrdersByWeek,
+        getLatestTransactions,
+    };
 };

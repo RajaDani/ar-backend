@@ -1,10 +1,12 @@
 module.exports = function svcArea(opts) {
-    const { sequelize, sequelizeCon, mdlOrder, mdlItem, Op, mdlUser, mdlCustomerAddress, mdlRider } = opts;
+    const { sequelize, sequelizeCon, mdlOrder, mdlItem,
+        Op, mdlUser, mdlCustomerAddress, mdlRider, mdlServiceTime } = opts;
     const { Order } = mdlOrder;
     const { Item } = mdlItem;
     const { User } = mdlUser;
     const { CustomerAddress } = mdlCustomerAddress;
     const { Rider } = mdlRider;
+    const { ServiceTime } = mdlServiceTime;
 
     async function getDashboardAnalytics() {
         const orders = await Order.findOne({
@@ -22,17 +24,14 @@ module.exports = function svcArea(opts) {
         })
         const data = { orders, items };
         return data;
-
-
-
     }
 
     async function getOrdersByCity() {
         const orders = await sequelizeCon.query(`
-        SELECT City.name AS cityName, COUNT(Orders.id) AS orderCount
-        FROM Orders
-        INNER JOIN Areas ON Orders.area_id = Areas.id
-        INNER JOIN Cities AS City ON Areas.city_id = City.id
+        SELECT city.name AS cityName, COUNT(orders.id) AS orderCount
+        FROM orders
+        INNER JOIN areas ON orders.area_id = areas.id
+        INNER JOIN cities AS city ON areas.city_id = city.id
         GROUP BY cityName;
       `, {
             type: sequelize.QueryTypes.SELECT,
@@ -92,10 +91,6 @@ module.exports = function svcArea(opts) {
                 {
                     model: User,
                     attributes: ["name"]
-                },
-                {
-                    model: CustomerAddress,
-                    attributes: ["address_details"]
                 },
                 {
                     model: Rider,

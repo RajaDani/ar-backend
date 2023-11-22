@@ -4,7 +4,7 @@ module.exports = function svcCategory(opts) {
 
   async function getCategories(params) {
     const categories = await Category.findAll({
-      attributes: ["id", "name", "description", "image_url"],
+      attributes: ["id", "name", "display_title", "description", "image_url"],
       where: {
         status: 1
       }
@@ -14,7 +14,7 @@ module.exports = function svcCategory(opts) {
 
   async function getCategoryByID(params) {
     const category = await Category.findOne({
-      attributes: ["id", "name", "description", "image_url"],
+      attributes: ["id", "name", "display_title", "description", "image_url"],
       where: {
         id: params.id,
       },

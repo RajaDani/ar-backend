@@ -19,6 +19,14 @@ module.exports = function mdlUser(opts) {
             type: sequelize.INTEGER,
             allowNull: false,
         },
+        patient_name: {
+            type: sequelize.STRING,
+            allowNull: true,
+        },
+        patient_address: {
+            type: sequelize.STRING,
+            allowNull: true,
+        },
         appointment_type: {
             type: sequelize.STRING,
             allowNull: false,
@@ -51,7 +59,6 @@ module.exports = function mdlUser(opts) {
 
     Appointment.belongsTo(Item, { foreignKey: 'item_id' });
     Appointment.belongsTo(User, { foreignKey: 'customer_id' });
-    Appointment.belongsTo(CustomerAddress, { foreignKey: 'address_id' });
 
     return {
         Appointment,

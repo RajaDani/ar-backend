@@ -35,6 +35,7 @@ module.exports = function riderSchema(opts) {
           address: Joi.string().required(),
           image_url: Joi.string().allow(null, ""),
           contact: Joi.number().allow(null, ""),
+          city_id: Joi.number().required(),
         }),
       },
       preHandler: async (request, reply) => {
@@ -55,6 +56,7 @@ module.exports = function riderSchema(opts) {
           address: Joi.string().required(),
           image_url: Joi.string().allow(null, ""),
           contact: Joi.number().allow(null, ""),
+          city_id: Joi.number().required(),
         }),
       },
       preHandler: async (request, reply) => {

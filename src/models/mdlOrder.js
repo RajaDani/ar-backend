@@ -1,11 +1,12 @@
 module.exports = function mdlUser(opts) {
-  const { sequelize, sequelizeCon, mdlUser, mdlRider, mdlCustomerAddress, mdlArea, mdlCoupon } =
+  const { sequelize, sequelizeCon, mdlUser, mdlRider, mdlCustomerAddress, mdlArea, mdlCoupon, mdlCity } =
     opts;
   const { User } = mdlUser;
   const { Rider } = mdlRider;
   const { CustomerAddress } = mdlCustomerAddress;
   const { Area } = mdlArea;
   const { Coupon } = mdlCoupon;
+  const { City } = mdlCity;
 
   const Order = sequelizeCon.define("order", {
     id: {
@@ -46,6 +47,10 @@ module.exports = function mdlUser(opts) {
       type: sequelize.STRING,
       allowNull: true,
     },
+    address: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
     order_bill_image: {
       type: sequelize.STRING,
       allowNull: true,
@@ -66,9 +71,9 @@ module.exports = function mdlUser(opts) {
 
   Order.belongsTo(User, { foreignKey: "customer_id" });
   Order.belongsTo(Rider, { foreignKey: "rider_id" });
-  Order.belongsTo(CustomerAddress, { foreignKey: "address_id" });
   Order.belongsTo(Area, { foreignKey: "area_id" });
   Order.belongsTo(Coupon, { foreignKey: "coupon_id" });
+  Order.belongsTo(City, { foreignKey: "city_id" });
 
   return {
     Order,

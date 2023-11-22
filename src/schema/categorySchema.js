@@ -25,6 +25,7 @@ module.exports = function categorySchema(opts) {
         body: Joi.object().keys({
           name: Joi.string().required(),
           description: Joi.string().allow(null, ""),
+          display_title: Joi.string().allow(null, ""),
           image_url: Joi.string().allow(null, ""),
         }),
       },
@@ -42,6 +43,7 @@ module.exports = function categorySchema(opts) {
       schema: {
         body: Joi.object().keys({
           name: Joi.string().required(),
+          display_title: Joi.string().allow(null, ""),
           description: Joi.string().allow(null, ""),
           image_url: Joi.string().allow(null, ""),
         }),

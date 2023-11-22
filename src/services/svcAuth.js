@@ -1,26 +1,39 @@
 module.exports = function svcAuth(opts) {
-  const { sequelize, mdlUser, mdlAdmin, encryption, config, mdlCustomerAddress } = opts;
+  const {
+    sequelize,
+    mdlUser,
+    mdlAdmin,
+    encryption,
+    config,
+    mdlCustomerAddress,
+  } = opts;
   const { User } = mdlUser;
   const { Admin } = mdlAdmin;
   const { CustomerAddress } = mdlCustomerAddress;
 
   async function createUser(params) {
-    const { name, email, password, contact, address_details, lat, lng } = params;
-    User.sync();
-    const count = await User.count({ where: { email: email } });
-    if (count > 0) return { code: 200, msg: "Email already exists!" };
+    const { name, email, password, contact, address_details, lat, lng } =
+      params;
+    const emailCheck = await User.count({ where: { email } });
+    if (emailCheck > 0) return { code: 500, msg: "Email already exists!" };
+    const contactCheck = await User.count({ where: { contact } });
+    if (contactCheck > 0) return { code: 500, msg: "Contact already exists!" };
     const pass = encryption.hashPassword(password, config);
     const token = await encryption.generateToken(params);
     if (token) {
       const user = await User.create({
         name,
         email,
-        pass,
+        password: pass,
         contact,
       });
-      if (user) await CustomerAddress.create({
-        address_details, lat, lng, customerId: user.id
-      })
+      if (user)
+        await CustomerAddress.create({
+          address_details,
+          lat,
+          lng,
+          customerId: user.id,
+        });
 
       if (user) return { msg: "success", token };
     }
@@ -56,6 +69,11 @@ module.exports = function svcAuth(opts) {
           email: email,
           password: pass,
         },
+        include: [{
+          model: CustomerAddress,
+          attributes: ["address_details"]
+        }],
+        // raw: true
       });
       if (!user) return { msg: "Incorrect username or password!" };
 
@@ -64,9 +82,11 @@ module.exports = function svcAuth(opts) {
         return {
           msg: "success",
           token,
+          id: user.id,
           name: user.name,
           email: user.email,
           contact: user.contact,
+          address: user.customer_addresses[0].address_details
         };
     } catch (error) {
       return { code: 500, msg: "Something went wrong" };
@@ -94,7 +114,7 @@ module.exports = function svcAuth(opts) {
           email: admin.email,
           modules: admin.modules,
           contact: admin.contact,
-          admin_type: admin.admin_type
+          admin_type: admin.admin_type,
         };
         return { msg: "success", data };
       }

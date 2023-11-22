@@ -5,18 +5,19 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "local": "nodemon server.js --benv local"
+    "local": "nodemon server.js --benv local",
+    "development": "nodemon server.js --benv development"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RajaDani/ar-backend.git"
+    "url": "git+https://github.com/Ar-Home-Services/ar-backend.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/RajaDani/ar-backend/issues"
+    "url": "https://github.com/Ar-Home-Services/ar-backend/issues"
   },
-  "homepage": "https://github.com/RajaDani/ar-backend#readme",
+  "homepage": "https://github.com/Ar-Home-Services/ar-backend#readme",
   "dependencies": {
     "@fastify/cors": "^8.3.0",
     "awilix": "^8.0.1",
@@ -32,8 +33,5 @@
     "nodemon": "^3.0.1",
     "pino-pretty": "^10.2.0",
     "sequelize": "^6.32.1"
-  },
-  "engines": {
-    "node": ">=18"
   }
 }

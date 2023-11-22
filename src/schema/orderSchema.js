@@ -29,10 +29,12 @@ module.exports = function orderSchema(opts) {
             method: "POST",
             schema: {
                 body: Joi.object().keys({
-                    customer_id: Joi.number().allow(null, ""),
-                    progress_status: Joi.string().allow(""),
                     createdAt: Joi.string().allow(""),
-                    posted_by: Joi.number().allow(null, "")
+                    posted_by: Joi.number().allow(null, ""),
+                    progress_status: Joi.string().allow(""),
+                    city_id: Joi.number().allow(null, ""),
+                    limit: Joi.number().allow(null),
+                    offset: Joi.number().allow(null)
                 }),
             },
             url: "/order/search",
@@ -68,7 +70,7 @@ module.exports = function orderSchema(opts) {
                     progress_status: Joi.string().allow(null, ""),
                     item: Joi.array().allow(null),
                     customer_id: Joi.number().required(),
-                    address_id: Joi.number().required(),
+                    address: Joi.string().required(),
                     area_id: Joi.number().required(),
                     city_id: Joi.number().required(),
                     rider_id: Joi.number().allow(null),
@@ -108,7 +110,7 @@ module.exports = function orderSchema(opts) {
                     progress_status: Joi.string().required(),
                     item: Joi.array().allow(null),
                     customer_id: Joi.number().required(),
-                    address_id: Joi.number().required(),
+                    address: Joi.string().required(),
                     area_id: Joi.number().required(),
                     city_id: Joi.number().required(),
                     rider_id: Joi.number().required(),
@@ -119,6 +121,23 @@ module.exports = function orderSchema(opts) {
                 await fastify.verifyAdminToken(request, reply);
             },
             handler: orderController.updateOrder,
+        };
+    };
+
+    const quickUpdate = ({ fastify }) => {
+        return {
+            method: "PUT",
+            url: "/order/update/status/:id",
+            schema: {
+                body: Joi.object().keys({
+                    progress_status: Joi.string().allow(null, ""),
+                    rider_id: Joi.number().allow(null, ""),
+                }),
+            },
+            preHandler: async (request, reply) => {
+                await fastify.verifyAdminToken(request, reply);
+            },
+            handler: orderController.quickUpdateOrder,
         };
     };
 
@@ -139,6 +158,7 @@ module.exports = function orderSchema(opts) {
         readByID,
         add,
         update,
+        quickUpdate,
         deleteByID
     };
 };

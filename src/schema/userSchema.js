@@ -34,6 +34,29 @@ module.exports = function userSchema(opts) {
     };
   };
 
+  const getUserOrders = ({ fastify }) => {
+    return {
+      method: "GET",
+      url: "/customer/read/orders/:id",
+      handler: userController.getUserOrders,
+      preHandler: async (request, reply) => {
+        await fastify.verifyToken(request, reply);
+      },
+    };
+  };
+
+  const getUserAppointments = ({ fastify }) => {
+    return {
+      method: "GET",
+      url: "/customer/read/appointments/:id",
+      handler: userController.getUserAppointments,
+      preHandler: async (request, reply) => {
+        await fastify.verifyToken(request, reply);
+      },
+    };
+  };
+
+
   const add = ({ fastify }) => {
     return {
       method: "POST",
@@ -47,6 +70,7 @@ module.exports = function userSchema(opts) {
           address_details: Joi.string().required(),
           lat: Joi.number().optional().allow(null, ""),
           lng: Joi.number().optional().allow(null, ""),
+          city_id: Joi.number().required(),
         }),
       },
       preHandler: async (request, reply) => {
@@ -65,6 +89,7 @@ module.exports = function userSchema(opts) {
           name: Joi.string().required(),
           contact: Joi.number().required(),
           address_details: Joi.string().required(),
+          city_id: Joi.number().required(),
         }),
       },
       preHandler: async (request, reply) => {
@@ -86,6 +111,7 @@ module.exports = function userSchema(opts) {
           address_details: Joi.string().optional().allow(""),
           lat: Joi.number().optional().allow(null, ""),
           lng: Joi.number().optional().allow(null, ""),
+          city_id: Joi.number().required(),
         }),
       },
       preHandler: async (request, reply) => {
@@ -94,6 +120,24 @@ module.exports = function userSchema(opts) {
       handler: userController.updateCustomer,
     };
   };
+
+  const updatePassword = ({ fastify }) => {
+    return {
+      method: "PUT",
+      url: "/customer/update/password/:id",
+      schema: {
+        body: Joi.object().keys({
+          curr_password: Joi.string().required(),
+          new_password: Joi.string().required(),
+        }),
+      },
+      preHandler: async (request, reply) => {
+        await fastify.verifyToken(request, reply);
+      },
+      handler: userController.updatePassword,
+    };
+  };
+
 
   const deleteByID = ({ fastify }) => {
     return {
@@ -106,5 +150,8 @@ module.exports = function userSchema(opts) {
     };
   };
 
-  return { read, readAddress, readByID, add, quickAdd, update, deleteByID };
+  return {
+    read, readAddress, readByID, getUserOrders,
+    getUserAppointments, add, quickAdd, update, updatePassword, deleteByID
+  };
 };

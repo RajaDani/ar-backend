@@ -16,6 +16,16 @@ module.exports = function customerController(opts) {
     reply.send({ code: 200, reply: record });
   }
 
+  async function getUserOrders(request, reply) {
+    const record = await svcUser.getUserOrders(request.params);
+    reply.send({ code: 200, reply: record });
+  }
+
+  async function getUserAppointments(request, reply) {
+    const record = await svcUser.getUserAppointments(request.params);
+    reply.send({ code: 200, reply: record });
+  }
+
   async function addCustomer(request, reply) {
     const record = await svcUser.addCustomer(request.body);
     reply.send({ code: 200, reply: record });
@@ -33,6 +43,12 @@ module.exports = function customerController(opts) {
     reply.send({ code: 200, reply: record });
   }
 
+  async function updatePassword(request, reply) {
+    const { params, body } = request;
+    const record = await svcUser.updatePassword(params, body);
+    reply.send(record);
+  }
+
   async function deleteCustomerByID(request, reply) {
     const record = await svcUser.deleteCustomerByID(request.params);
     reply.send({ code: 200, reply: record });
@@ -42,7 +58,10 @@ module.exports = function customerController(opts) {
     getCustomers,
     getCustomerAddress,
     getCustomerByID,
+    getUserOrders,
+    getUserAppointments,
     addCustomer,
+    updatePassword,
     quickAddCustomer,
     updateCustomer,
     deleteCustomerByID,

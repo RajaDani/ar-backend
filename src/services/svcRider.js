@@ -1,6 +1,7 @@
 module.exports = function svcRider(opts) {
-  const { sequelizeCon, mdlRider, config, encryption, cloudinary } = opts;
+  const { sequelizeCon, mdlRider, config, encryption, cloudinary, mdlCity } = opts;
   const { Rider } = mdlRider;
+  const { City } = mdlCity;
 
   async function getRiders(params) {
     // sequelizeCon.sync({ force: true });
@@ -8,7 +9,11 @@ module.exports = function svcRider(opts) {
       attributes: ["id", "name", "email", "contact", "address", "image_url", "status"],
       where: {
         status: 1
-      }
+      },
+      include: [{
+        model: City,
+        attributes: ["id", "name"]
+      }]
     });
     return riders;
   }
@@ -16,6 +21,10 @@ module.exports = function svcRider(opts) {
   async function getRiderByID(params) {
     const rider = await Rider.findOne({
       attributes: ["id", "name", "email", "contact", "address", "image_url"],
+      include: [{
+        model: City,
+        attributes: ["name"]
+      }],
       where: {
         id: params.id,
       },
