@@ -27,5 +27,27 @@
     },
     "encryption": {
         "key": "d423582a4adasd-34627-fsdfsd45435dss-455ffd5"
+    },
+    "firebase": {
+        "type": "service_account",
+        "project_id": "ar-home-e2791",
+        "private_key_id": "3b767559776231db8545b917e626b9dab66dc33a",
+        "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCIFPOcWIaSIjgh\nhc0VwaSLgfX6Yi7NsL/qFXVcv+QW48ySj17HXU/l3ZRa8QoeRgUzLdMEnsL6QNCs\nT+UZU72HxmZrnucOIMYkHA0WH8cHZ/2AkeEtqkB5EZBmN7OJhg16VGQv+hMkeTXO\nvOYnnAqiYKaP4eFzrji3f1dB4RmDXVC6SxEt2uIyK1U/plgIkRjgUy2xiExDz1/i\nwAHIkBNTqGzDAnnMuOT7HMdgAvnnhaaYJiUoSn9A6yzYclQn3poakbxjlf2wKTM+\nWuJFrzmM0+X+efBLVScwuLAfk0O2oDxyz3ybIuhswfAlBAUqWiIjeP1P3/JFUzb0\nGI875QmlAgMBAAECggEAFV/DFtDRzES7L8rCGHN6qp3uWpZO1yh2sGgP79JFG3JK\n2M9TmflWWhrIWVNoXTJu0SfWr/BW3DNPg20mJSkByUB4qFlEXfP4Y0YTqSCzJH7p\nMqdXKNLHvyxq059WoBhx5/+239FF7fHq6W7CsMCB7BjFuK5IOOEJ0AqclECsvvTv\n25KFpgdyPeBFNoWRwCxxInTWbh4wbITFRtkNf8ulPm+lEl/5Z8ggfTL6uJpbShOS\nQjgDsN9wj9MLxXsQWhy54GJyFTY4A4aRW91uMeGy+cJoqDw2ZNTuOzxQr9WhqTa+\nSCVjnnvT8sNalbEpGNO/OE28+f8yvRF+TMcceS9HeQKBgQC93YPb082o8+lt2hNU\nKtUeX+JPcaeVGyxtCt6kHeHTeludFMJV8r0Rt1MOJ0zAemgC2vOy/4fmFbFWCQ1Y\njKWaHBf/zyALAUUieRACyM+hZuqdGk80LpJSOhOh0S/zGzA8kxBqe7OfYlBNdb2G\nD/6FOAamuJCF8oH2qsJDI1iIrQKBgQC3e4Kua9ZRSkgRvgDIOR/wmzBNu/RsaI1q\nr67fS9y8VLR/gEQJnssnu2X/vKFDFV4LDVA95htT9PB/Jp2iJxlXaE5EAK3Mluop\nUYleU6Lio63S7PYmvso6npSxltGMglWLc0yAxsH78w2IkhKRbptm5ui0JOTaBbQw\nLtdFLljL2QKBgQCNJquqt/HDU2IM6v1Hq3g5VqtWyHX/4e3LOzN960FCCUsmopI/\nd3CcRSAX+5uR1O6SgNiAEHylzybBgYVMeXN7+LrW0NNPmygcksgWadgCdBKjrTWI\n476gJtEFkhEFuQbJYcPohgJp0ZtFmuzFSAq+W4KGW9wF2N5J1XUKmLJvGQKBgCNQ\nrHhx3RBMYc64aWIgTJt84zEzCfqLrRxpsBjeex/slcksoOvRGn0NPraYUdmdlTo/\nV8ByN7RTIq72ecSqDeCa/OVt1AXazjshrHTxWBqTMnO0lDQk6LubpjcANlj7BQgQ\nKxtmJhQeVe6BXv2K8nI943A44attCZ90hI6WOxURAoGALmnFSoQUPAUR2c+5oyy0\nadA9Qa1WUMS2d8wTqnAe3AndQvdSX5PklUeYxqCCN77ren1qP6NE5LAggiSc/eML\nVt6jYnGYEKHSNtX81+owOmHsp6QSIuacyaVSsi2ng8zynfRPzFs88f67B5Gghs/X\nEJwem+SjpprLZKTdrPyh+VU=\n-----END PRIVATE KEY-----\n",
+        "client_email": "firebase-adminsdk-a3rq9@ar-home-e2791.iam.gserviceaccount.com",
+        "client_id": "102539000696877528400",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-a3rq9%40ar-home-e2791.iam.gserviceaccount.com",
+        "universe_domain": "googleapis.com"
+    },
+    "smtpConfig": {
+        "host": "smtp.gmail.com",
+        "port": 465,
+        "secure": true,
+        "auth": {
+            "user": "info@eagle-iot.com",
+            "pass": "grezwndpaamfklsy"
+        }
     }
 }

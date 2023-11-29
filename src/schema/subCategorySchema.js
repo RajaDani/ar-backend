@@ -81,6 +81,22 @@ module.exports = function subCategorySchema(opts) {
       handler: subCategoryController.deleteSubCategoryByID,
     };
   };
+  const searchSubCategory = ({ fastify }) => {
+    return {
+      method: "GET",
+      url: "/subcategory/search/:categoryId/:name",
+      handler: subCategoryController.searchSubCategory,
+    };
+  };
 
-  return { read, readByCategory, readByBusiness, readByID, add, update, deleteByID };
+  return {
+    read,
+    readByCategory,
+    readByBusiness,
+    readByID,
+    add,
+    update,
+    deleteByID,
+    searchSubCategory,
+  };
 };

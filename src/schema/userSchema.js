@@ -80,6 +80,27 @@ module.exports = function userSchema(opts) {
     };
   };
 
+  const addAddress = ({ fastify }) => {
+    return {
+      method: "POST",
+      url: "/customer/add/address",
+      schema: {
+        body: Joi.object().keys({
+          address_details: Joi.string().required(),
+          customerId: Joi.number().required(),
+          lat: Joi.number().optional().allow(null, ""),
+          lng: Joi.number().optional().allow(null, ""),
+        }),
+      },
+      preHandler: async (request, reply) => {
+        await fastify.verifyAdminToken(request, reply);
+      },
+      handler: userController.addCustomerAddress,
+    };
+  };
+
+
+
   const quickAdd = ({ fastify }) => {
     return {
       method: "POST",
@@ -152,6 +173,6 @@ module.exports = function userSchema(opts) {
 
   return {
     read, readAddress, readByID, getUserOrders,
-    getUserAppointments, add, quickAdd, update, updatePassword, deleteByID
+    getUserAppointments, add, addAddress, quickAdd, update, updatePassword, deleteByID
   };
 };

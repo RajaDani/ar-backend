@@ -1,5 +1,13 @@
 module.exports = function svcSubcategory(opts) {
-  const { mdlSubcategory, cloudinary, mdlCategory, mdlBusinessCategory, mdlItem, sequelize, Op } = opts;
+  const {
+    mdlSubcategory,
+    cloudinary,
+    mdlCategory,
+    mdlBusinessCategory,
+    mdlItem,
+    sequelize,
+    Op,
+  } = opts;
   const { Subcategory } = mdlSubcategory;
   const { Category } = mdlCategory;
   const { BusinessCategory } = mdlBusinessCategory;
@@ -9,8 +17,8 @@ module.exports = function svcSubcategory(opts) {
     const subcategory = await Subcategory.findAll({
       attributes: ["id", "name", "description", "image_url"],
       where: {
-        status: 1
-      }
+        status: 1,
+      },
     });
     return subcategory;
   }
@@ -19,38 +27,42 @@ module.exports = function svcSubcategory(opts) {
     const { categoryId } = params;
     const subcategory = await Subcategory.findAll({
       attributes: ["id", "name", "description", "image_url"],
-      include: [{
-        model: Category,
-        attributes: []
-      }],
+      include: [
+        {
+          model: Category,
+          attributes: [],
+        },
+      ],
       where: {
         status: 1,
-        category_id: categoryId
-      }
+        category_id: categoryId,
+      },
     });
     return subcategory;
   }
 
-
   async function getSubCategoriesByBusiness(params) {
     const { businessId } = params;
     const ids = await Item.findAll({
-      attributes: [sequelize.fn('DISTINCT', sequelize.col('subcategory_id')), 'subcategory_id'],
+      attributes: [
+        sequelize.fn("DISTINCT", sequelize.col("subcategory_id")),
+        "subcategory_id",
+      ],
       where: {
         business_id: businessId,
-        status: 1
+        status: 1,
       },
-      raw: true
+      raw: true,
     });
 
-    const subcategoryIds = ids.map(item => item.subcategory_id);
+    const subcategoryIds = ids.map((item) => item.subcategory_id);
     const businesses = await Subcategory.findAll({
       attributes: ["id", "name"],
       where: {
         status: 1,
-        id: { [Op.in]: subcategoryIds }
-      }
-    })
+        id: { [Op.in]: subcategoryIds },
+      },
+    });
     // const { category_id } = await BusinessCategory.findOne({
     //   where: {
     //     business_id: businessId
@@ -66,17 +78,18 @@ module.exports = function svcSubcategory(opts) {
     return businesses;
   }
 
-
   async function getSubCategoryByID(params) {
     const subcategory = await Subcategory.findOne({
-      attributes: ['id', 'name', 'description', "image_url", "category_id"],
+      attributes: ["id", "name", "description", "image_url", "category_id"],
       where: {
         id: params.id,
       },
-      include: [{
-        model: Category,
-        attributes: ["name"]
-      }]
+      include: [
+        {
+          model: Category,
+          attributes: ["name"],
+        },
+      ],
     });
     return subcategory;
   }
@@ -99,29 +112,41 @@ module.exports = function svcSubcategory(opts) {
       const { secure_url } = await cloudinary.v2.uploader.upload(image_url);
       data["image_url"] = secure_url;
     }
-    const subcategory = await Subcategory.update(
-      data,
+    const subcategory = await Subcategory.update(data, {
+      where: {
+        id: params.id,
+      },
+    });
+
+    return subcategory;
+  }
+
+  async function deleteSubCategoryByID(params) {
+    const subCategory = await Subcategory.update(
+      {
+        status: 0,
+      },
       {
         where: {
           id: params.id,
         },
       }
     );
+    return subCategory;
+  }
+  async function searchSubCategory(params) {
+    const { categoryId, name } = params;
+    const subcategory = await Subcategory.findAll({
+      where: {
+        name: {
+          [Op.like]: `%${name}%`,
+        },
+        category_id: categoryId,
+        status: 1,
+      },
+    });
 
     return subcategory;
-  }
-
-  async function deleteSubCategoryByID(params) {
-    const subCategory = await Subcategory.update({
-      status: 0
-    },
-      {
-        where: {
-          id: params.id,
-        },
-
-      });
-    return subCategory
   }
 
   return {
@@ -131,6 +156,7 @@ module.exports = function svcSubcategory(opts) {
     getSubCategoryByID,
     addSubCategory,
     updateSubCategory,
-    deleteSubCategoryByID
+    deleteSubCategoryByID,
+    searchSubCategory,
   };
 };

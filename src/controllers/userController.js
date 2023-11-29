@@ -31,6 +31,12 @@ module.exports = function customerController(opts) {
     reply.send({ code: 200, reply: record });
   }
 
+  async function addCustomerAddress(request, reply) {
+    const record = await svcUser.addCustomerAddress(request.body);
+    reply.send({ code: 200, reply: record });
+  }
+
+
   async function quickAddCustomer(request, reply) {
     const record = await svcUser.quickAddCustomer(request.body);
     reply.send({ code: 200, reply: record });
@@ -61,6 +67,7 @@ module.exports = function customerController(opts) {
     getUserOrders,
     getUserAppointments,
     addCustomer,
+    addCustomerAddress,
     updatePassword,
     quickAddCustomer,
     updateCustomer,

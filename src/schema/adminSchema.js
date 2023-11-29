@@ -37,9 +37,9 @@ module.exports = function adminSchema(opts) {
           modules: Joi.string().required(),
         }),
       },
-      // preHandler: async (request, reply) => {
-      //   await fastify.verifyAdminToken(request, reply);
-      // },
+      preHandler: async (request, reply) => {
+        await fastify.verifyAdminToken(request, reply);
+      },
       handler: adminController.addAdmin,
     };
   };

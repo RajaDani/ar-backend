@@ -7,12 +7,16 @@ module.exports = function subcategoryController(opts) {
   }
 
   async function getSubCategoriesByCategory(request, reply) {
-    const records = await svcSubCategory.getSubCategoriesByCategory(request.params);
+    const records = await svcSubCategory.getSubCategoriesByCategory(
+      request.params
+    );
     reply.send({ code: 200, reply: records });
   }
 
   async function getSubCategoriesByBusiness(request, reply) {
-    const records = await svcSubCategory.getSubCategoriesByBusiness(request.params);
+    const records = await svcSubCategory.getSubCategoriesByBusiness(
+      request.params
+    );
     reply.send({ code: 200, reply: records });
   }
 
@@ -36,6 +40,10 @@ module.exports = function subcategoryController(opts) {
     const record = await svcSubCategory.deleteSubCategoryByID(request.params);
     reply.send({ code: 200, reply: record });
   }
+  async function searchSubCategory(request, reply) {
+    const record = await svcSubCategory.searchSubCategory(request.params);
+    reply.send({ code: 200, reply: record });
+  }
 
   return {
     getSubCategories,
@@ -45,5 +53,6 @@ module.exports = function subcategoryController(opts) {
     addSubCategory,
     updateSubCategory,
     deleteSubCategoryByID,
+    searchSubCategory,
   };
 };

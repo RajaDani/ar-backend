@@ -7,8 +7,10 @@ const container = awilix.createContainer();
 const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
 const sequelizeCon = require("../adapter/sequelize");
+const firebase = require("../adapter/firebase");
 const cloudinary = require('cloudinary');
 const Boom = require("boom")
+const nodemailer = require("nodemailer");
 
 module.exports = async function FastDI(options = {}) {
   const logger = _.get(options, "logger", undefined);
@@ -38,6 +40,8 @@ module.exports = async function FastDI(options = {}) {
     Op: awilix.asValue(Op),
     cloudinary: awilix.asValue(cloudinary),
     Boom: awilix.asValue(Boom),
+    firebase: awilix.asValue(firebase),
+    nodemailer: awilix.asValue(nodemailer)
   });
 
   container.loadModules(
@@ -61,16 +65,16 @@ module.exports = async function FastDI(options = {}) {
 
   const _container = async () => container;
 
-  // const register = async (type, value) => {
-  //   switch (type) {
-  //     case "sequelizeCon":
-  //       container.register(
-  //         "sequelizeCon",
-  //         awilix.asFunction(() => value).singleton()
-  //       );
-  //       break;
-  //   }
-  // };
+  const register = async (type, value) => {
+    switch (type) {
+      case "firebase":
+        container.register(
+          "firebase",
+          awilix.asFunction(() => value).singleton()
+        );
+        break;
+    }
+  };
 
   return {
     _container,

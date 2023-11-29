@@ -195,7 +195,74 @@ module.exports = function svcBusiness(opts) {
     );
     return business;
   }
+  // async function searchBusiness(params) {
+  //   const { name } = params;
 
+  //   const business = await Business.findAll({
+  //     attributes: [
+  //       "id",
+  //       "name",
+  //       "email",
+  //       "contact",
+  //       "address",
+  //       "rating",
+  //       "image_url",
+  //     ],
+  //     where: {
+  //       name: {
+  //         [Op.like]: `%${name}%`,
+  //       },
+  //       status: 1,
+  //     },
+  //   });
+
+  //   return business;
+  // }
+  async function searchBusinessByCategory(params) {
+    const { categoryId, name } = params;
+    const businesses = await BusinessCategory.findAll({
+      attributes: [],
+      include: [
+        {
+          model: Business,
+          attributes: ["id", "name", "image_url", "rating", "description"],
+          where: {
+            name: {
+              [Op.like]: `%${name}%`,
+            },
+            status: true,
+          },
+        },
+      ],
+      where: {
+        category_id: categoryId,
+      },
+    });
+    return businesses;
+  }
+  async function searchBusiness(params) {
+    const { name } = params;
+
+    const businesses = await Business.findAll({
+      attributes: [
+        "id",
+        "name",
+        "email",
+        "contact",
+        "address",
+        "rating",
+        "image_url",
+      ],
+      where: {
+        name: {
+          [Op.like]: `%${name}%`,
+        },
+        status: 1,
+      },
+    });
+
+    return businesses;
+  }
   return {
     getBusinesses,
     getBusinessByCategory,
@@ -205,5 +272,7 @@ module.exports = function svcBusiness(opts) {
     addBusiness,
     updateBusiness,
     deleteBusinessByID,
+    searchBusinessByCategory,
+    searchBusiness,
   };
 };

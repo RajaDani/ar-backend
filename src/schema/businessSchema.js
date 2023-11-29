@@ -110,6 +110,31 @@ module.exports = function businessSchema(opts) {
       handler: businessController.deleteBusinessByID,
     };
   };
+  const searchBusiness = ({ fastify }) => {
+    return {
+      method: "GET",
+      url: "/business/search/:name",
+      handler: businessController.searchBusiness,
+    };
+  };
+  const searchBusinessByCategory = ({ fastify }) => {
+    return {
+      method: "GET",
+      url: "/business/search/:categoryId/:name",
+      handler: businessController.searchBusinessByCategory,
+    };
+  };
 
-  return { read, readByID, readFeatured, add, update, readByCategory, readBySubCategory, deleteByID };
+  return {
+    read,
+    readByID,
+    readFeatured,
+    add,
+    update,
+    readByCategory,
+    readBySubCategory,
+    deleteByID,
+    searchBusiness,
+    searchBusinessByCategory,
+  };
 };

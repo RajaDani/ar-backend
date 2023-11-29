@@ -65,6 +65,13 @@ module.exports = function categorySchema(opts) {
       handler: categoryController.deleteCategoryByID,
     };
   };
+  const searchCategory = ({ fastify }) => {
+    return {
+      method: "GET",
+      url: "/category/search/:name",
+      handler: categoryController.searchCategory,
+    };
+  };
 
-  return { read, readByID, add, update, deleteByID };
+  return { read, readByID, add, update, deleteByID, searchCategory };
 };

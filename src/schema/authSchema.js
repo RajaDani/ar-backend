@@ -7,7 +7,7 @@ module.exports = function userSchema(opts) {
       url: "/user/login",
       schema: {
         body: Joi.object().keys({
-          email: Joi.string().required(),
+          contact: Joi.number().required(),
           password: Joi.string().required(),
         }),
       },
@@ -26,8 +26,9 @@ module.exports = function userSchema(opts) {
           password: Joi.string().required(),
           contact: Joi.number().allow(null, ""),
           address_details: Joi.string().allow(""),
-          lat: Joi.number().allow(null, ""),
-          lng: Joi.number().allow(null, ""),
+          lat: Joi.number().optional().allow(null, ""),
+          lng: Joi.number().optional().allow(null, ""),
+          city_id: Joi.number().required(),
         }),
       },
       handler: authController.createUser,
@@ -48,11 +49,24 @@ module.exports = function userSchema(opts) {
     };
   };
 
-
+  const loginRider = ({ fastify }) => {
+    return {
+      method: "POST",
+      url: "/rider/login",
+      schema: {
+        body: Joi.object().keys({
+          email: Joi.string().required(),
+          password: Joi.string().required(),
+        }),
+      },
+      handler: authController.verifyRider,
+    };
+  };
 
   return {
     login,
     signup,
     loginAdmin,
+    loginRider,
   };
 };

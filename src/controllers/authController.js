@@ -10,6 +10,10 @@ module.exports = function authController(opts) {
     const record = await svcAuth.verifyAdmin(req.body);
     reply.send({ code: 200, reply: record });
   }
+  async function verifyRider(req, reply) {
+    const record = await svcAuth.verifyRider(req.body);
+    reply.send({ code: 200, reply: record });
+  }
 
   async function createUser(req, reply) {
     const record = await svcAuth.createUser(req.body);
@@ -26,5 +30,6 @@ module.exports = function authController(opts) {
     createUser,
     verifyAdmin,
     createAdmin,
+    verifyRider,
   };
 };

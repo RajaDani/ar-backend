@@ -76,6 +76,16 @@ module.exports = function riderSchema(opts) {
       handler: riderController.deleteRiderByID,
     };
   };
+  const getRiderOrders = ({ fastify }) => {
+    return {
+      method: "GET",
+      url: "/rider/read/orders/:id",
+      handler: riderController.getRiderOrders,
+      preHandler: async (request, reply) => {
+        await fastify.verifyToken(request, reply);
+      },
+    };
+  };
 
-  return { read, readByID, add, update, deleteByID };
+  return { read, readByID, add, update, deleteByID, getRiderOrders };
 };

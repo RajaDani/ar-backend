@@ -13,6 +13,9 @@ module.exports = function svcOrder(opts) {
     sequelize,
     sequelizeCon,
     mdlCity,
+    config,
+    mdlAdmin,
+    nodemailer
   } = opts;
   const { Order } = mdlOrder;
   const { Business } = mdlBusiness;
@@ -23,6 +26,25 @@ module.exports = function svcOrder(opts) {
   const { CustomerAddress } = mdlCustomerAddress;
   const { Area } = mdlArea;
   const { City } = mdlCity;
+  const { Admin } = mdlAdmin;
+
+  const sendEmail = async (email, orderData) => {
+    const smtp = config.get("smtpConfig");
+    const transporter = nodemailer.createTransport(smtp);
+    const emails = email.toString();
+    const { total } = orderData;
+
+    try {
+      await transporter.sendMail({
+        from: '"AR Home Services" <arhomeservices@gmail.com>',
+        to: `${emails}`,
+        subject: `Order Placed`,
+        html: `<p>A new order placed of total  ${total} pkr has been placed!</p>`
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   async function getOrders(params) {
     const { limit, offset } = params;
@@ -214,6 +236,12 @@ module.exports = function svcOrder(opts) {
     if (order) {
       await OrderItem.bulkCreate(itemData);
     }
+    const email = await Admin.findAll({
+      attributes: ["email"],
+      where: { status: 1 }
+    })
+    const emailsList = email.map((x) => x.email)
+    sendEmail(emailsList, params)
     return order.id;
   }
 

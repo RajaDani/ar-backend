@@ -26,6 +26,17 @@ module.exports = function categoryController(opts) {
     const record = await svcCategory.deleteCategoryByID(request.params);
     reply.send({ code: 200, reply: record });
   }
+  async function searchCategory(request, reply) {
+    const record = await svcCategory.searchCategory(request.params);
+    reply.send({ code: 200, reply: record });
+  }
 
-  return { getCategories, getCategoryByID, addCategory, updateCategory, deleteCategoryByID };
+  return {
+    getCategories,
+    getCategoryByID,
+    addCategory,
+    updateCategory,
+    deleteCategoryByID,
+    searchCategory,
+  };
 };

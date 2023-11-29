@@ -26,6 +26,17 @@ module.exports = function riderController(opts) {
     const record = await svcRider.deleteRiderByID(request.params);
     reply.send({ code: 200, reply: record });
   }
+  async function getRiderOrders(request, reply) {
+    const record = await svcRider.getRiderOrders(request.params);
+    reply.send({ code: 200, reply: record });
+  }
 
-  return { getRiders, getRiderByID, addRider, updateRider, deleteRiderByID };
+  return {
+    getRiders,
+    getRiderByID,
+    addRider,
+    updateRider,
+    deleteRiderByID,
+    getRiderOrders,
+  };
 };

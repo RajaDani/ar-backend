@@ -24,7 +24,6 @@ module.exports = function svcUser(opts) {
   }
 
   async function getCustomerAddress(params) {
-    // CustomerAddress.sync({ force: true })
     const { customerId } = params;
     const address = await CustomerAddress.findAll({
       attributes: ["id", "address_details"],
@@ -137,6 +136,11 @@ module.exports = function svcUser(opts) {
     return user.id;
   }
 
+  async function addCustomerAddress(body) {
+    const address = await CustomerAddress.create(body)
+    return address
+  }
+
   async function quickAddCustomer(params) {
     const { name, contact, address_details, city_id } =
       params;
@@ -161,7 +165,6 @@ module.exports = function svcUser(opts) {
 
   async function updateCustomer(params, data) {
     const { name, email, contact, address_details, lat, lng, city_id } = data;
-
     const user = await User.update(
       {
         name: name,
@@ -195,7 +198,7 @@ module.exports = function svcUser(opts) {
       }
     })
 
-    if (!userPass) Boom.conflict("Current password is incorrect!");
+    if (!userPass) throw Boom.conflict("Current password is incorrect!");
     const pass = encryption.hashPassword(new_password, config);
     const user = await User.update(
       { password: pass },
@@ -225,6 +228,7 @@ module.exports = function svcUser(opts) {
     getUserOrders,
     getUserAppointments,
     addCustomer,
+    addCustomerAddress,
     quickAddCustomer,
     updatePassword,
     updateCustomer,

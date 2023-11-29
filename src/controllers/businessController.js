@@ -40,6 +40,14 @@ module.exports = function businessController(opts) {
     const record = await svcBusiness.deleteBusinessByID(request.params);
     reply.send({ code: 200, reply: record });
   }
+  async function searchBusiness(request, reply) {
+    const record = await svcBusiness.searchBusiness(request.params);
+    reply.send({ code: 200, reply: record });
+  }
+  async function searchBusinessByCategory(request, reply) {
+    const record = await svcBusiness.searchBusinessByCategory(request.params);
+    reply.send({ code: 200, reply: record });
+  }
 
   return {
     getBusinesses,
@@ -49,6 +57,8 @@ module.exports = function businessController(opts) {
     updateBusiness,
     getBusinessByCategory,
     getBusinessBySubCategory,
-    deleteBusinessByID
+    deleteBusinessByID,
+    searchBusiness,
+    searchBusinessByCategory,
   };
 };

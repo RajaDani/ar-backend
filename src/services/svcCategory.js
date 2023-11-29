@@ -1,13 +1,13 @@
 module.exports = function svcCategory(opts) {
-  const { mdlCategory, cloudinary } = opts;
+  const { mdlCategory, cloudinary, Op } = opts;
   const { Category } = mdlCategory;
 
   async function getCategories(params) {
     const categories = await Category.findAll({
       attributes: ["id", "name", "display_title", "description", "image_url"],
       where: {
-        status: 1
-      }
+        status: 1,
+      },
     });
     return categories;
   }
@@ -40,29 +40,41 @@ module.exports = function svcCategory(opts) {
       const { secure_url } = await cloudinary.v2.uploader.upload(image_url);
       data["image_url"] = secure_url;
     }
+    const category = await Category.update(data, {
+      where: {
+        id: params.id,
+      },
+    });
+
+    return category;
+  }
+
+  async function deleteCategoryByID(params) {
     const category = await Category.update(
-      data,
+      {
+        status: 0,
+      },
       {
         where: {
           id: params.id,
         },
       }
     );
-
     return category;
   }
+  async function searchCategory(params) {
+    const { name } = params;
 
-  async function deleteCategoryByID(params) {
-    const category = await Category.update({
-      status: 0
-    },
-      {
-        where: {
-          id: params.id,
+    const category = await Category.findAll({
+      where: {
+        name: {
+          [Op.like]: `%${name}%`,
         },
+        status: 1,
+      },
+    });
 
-      });
-    return category
+    return category;
   }
 
   return {
@@ -70,6 +82,7 @@ module.exports = function svcCategory(opts) {
     getCategoryByID,
     addCategory,
     updateCategory,
-    deleteCategoryByID
+    deleteCategoryByID,
+    searchCategory,
   };
 };
