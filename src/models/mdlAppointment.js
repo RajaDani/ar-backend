@@ -19,11 +19,11 @@ module.exports = function mdlUser(opts) {
             type: sequelize.INTEGER,
             allowNull: false,
         },
-        patient_name: {
+        app_holder_name: {
             type: sequelize.STRING,
             allowNull: true,
         },
-        patient_address: {
+        app_holder_address: {
             type: sequelize.STRING,
             allowNull: true,
         },

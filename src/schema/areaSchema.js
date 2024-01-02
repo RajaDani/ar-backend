@@ -9,6 +9,14 @@ module.exports = function areaSchema(opts) {
         };
     };
 
+    const readLocationSide = ({ fastify }) => {
+        return {
+            method: "GET",
+            url: "/locationSide/read",
+            handler: areaController.getLocationSides,
+        };
+    };
+
     const readByID = ({ fastify }) => {
         return {
             method: "GET",
@@ -34,12 +42,32 @@ module.exports = function areaSchema(opts) {
                     name: Joi.string().required(),
                     delivery_charges: Joi.string().required(),
                     city_id: Joi.number().required(),
+                    location_side_id: Joi.number().required(),
+                    km_from_city: Joi.number().allow("", null),
+                    charges_per_km: Joi.number().allow("", null),
+                    road_issue: Joi.boolean().allow(0, 1),
                 }),
             },
             preHandler: async (request, reply) => {
                 await fastify.verifyAdminToken(request, reply);
             },
             handler: areaController.addArea,
+        };
+    };
+
+    const addLocationSide = ({ fastify }) => {
+        return {
+            method: "POST",
+            url: "/locationSide/add",
+            schema: {
+                body: Joi.object().keys({
+                    name: Joi.string().required(),
+                }),
+            },
+            preHandler: async (request, reply) => {
+                await fastify.verifyAdminToken(request, reply);
+            },
+            handler: areaController.addLocationSide,
         };
     };
 
@@ -52,6 +80,10 @@ module.exports = function areaSchema(opts) {
                     name: Joi.string().required(),
                     delivery_charges: Joi.string().required(),
                     city_id: Joi.number().required(),
+                    location_side_id: Joi.number().required(),
+                    km_from_city: Joi.number().allow("", null),
+                    charges_per_km: Joi.number().allow("", null),
+                    road_issue: Joi.boolean().allow(0, 1),
                 }),
             },
             preHandler: async (request, reply) => {
@@ -72,5 +104,5 @@ module.exports = function areaSchema(opts) {
         };
     };
 
-    return { read, readByID, readByCity, add, update, deleteByID };
+    return { read, readLocationSide, readByID, readByCity, add, addLocationSide, update, deleteByID };
 };

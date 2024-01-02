@@ -6,6 +6,11 @@ module.exports = function areaController(opts) {
         reply.send({ code: 200, reply: records });
     }
 
+    async function getLocationSides(request, reply) {
+        const records = await svcArea.getLocationSides(request.params);
+        reply.send({ code: 200, reply: records });
+    }
+
     async function getAreaByID(request, reply) {
         const records = await svcArea.getAreaByID(request.params);
         reply.send({ code: 200, reply: records });
@@ -21,6 +26,11 @@ module.exports = function areaController(opts) {
         reply.send({ code: 200, reply: record });
     }
 
+    async function addLocationSide(request, reply) {
+        const record = await svcArea.addLocationSide(request.body);
+        reply.send({ code: 200, reply: record });
+    }
+
     async function updateArea(request, reply) {
         const { params, body } = request;
         const record = await svcArea.updateArea(params, body);
@@ -31,5 +41,8 @@ module.exports = function areaController(opts) {
         reply.send({ code: 200, reply: record });
     }
 
-    return { getAreas, getAreaByID, getAreaByCity, addArea, updateArea, deleteAreaByID };
+    return {
+        getAreas, getLocationSides, getAreaByID, getAreaByCity,
+        addArea, addLocationSide, updateArea, deleteAreaByID
+    };
 };

@@ -15,7 +15,7 @@ module.exports = function svcSubcategory(opts) {
 
   async function getSubCategories(params) {
     const subcategory = await Subcategory.findAll({
-      attributes: ["id", "name", "description", "image_url"],
+      attributes: ["id", "name", "description", "image_url", "bachat_card_discount", "student_card_discount", "discount_all_users"],
       where: {
         status: 1,
       },
@@ -26,7 +26,7 @@ module.exports = function svcSubcategory(opts) {
   async function getSubCategoriesByCategory(params) {
     const { categoryId } = params;
     const subcategory = await Subcategory.findAll({
-      attributes: ["id", "name", "description", "image_url"],
+      attributes: ["id", "name", "description", "image_url", "bachat_card_discount", "student_card_discount", "discount_all_users"],
       include: [
         {
           model: Category,
@@ -80,7 +80,8 @@ module.exports = function svcSubcategory(opts) {
 
   async function getSubCategoryByID(params) {
     const subcategory = await Subcategory.findOne({
-      attributes: ["id", "name", "description", "image_url", "category_id"],
+      attributes: ["id", "name", "description", "image_url", "category_id",
+        "bachat_card_discount", "student_card_discount", "discount_all_users"],
       where: {
         id: params.id,
       },

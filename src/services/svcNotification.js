@@ -1,5 +1,5 @@
 module.exports = function svcCity(opts) {
-    const { sequelizeCon, mdlFcm, firebase } = opts;
+    const { sequelizeCon, mdlFcm, firebase, cloudinary } = opts;
 
     const { FCM } = mdlFcm;
 
@@ -7,7 +7,8 @@ module.exports = function svcCity(opts) {
         const message = {
             notification: {
                 title: data.title,
-                body: data.msg
+                body: data.msg,
+                image: data.image
             },
             tokens: tokensList,
         };
@@ -23,6 +24,7 @@ module.exports = function svcCity(opts) {
                             failedTokens.push(tokensList[idx]);
                         }
                     });
+                    console.log("tokens failed!", failedTokens)
                     // logger.info("Notification failed to send to tokens:", failedTokens);
                 } else {
                     console.log("Notification sent successfully to all tokens.");
@@ -54,6 +56,10 @@ module.exports = function svcCity(opts) {
 
     async function sendNotification(body) {
         try {
+            if (body?.image !== null || body?.image !== "") {
+                const { secure_url } = await cloudinary.v2.uploader.upload(body.image);
+                body["image"] = secure_url;
+            }
             const tokens = await FCM.findAll({
                 attributes: ["token"],
                 where: { role: "user" },

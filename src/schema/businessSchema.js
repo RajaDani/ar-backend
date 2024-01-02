@@ -52,10 +52,12 @@ module.exports = function businessSchema(opts) {
         body: Joi.object().keys({
           name: Joi.string().required(),
           email: Joi.string().allow(null, ""),
+          password: Joi.string().required(),
           contact: Joi.number().required(),
           address: Joi.string().required(),
           latitude: Joi.number().required(),
           longitude: Joi.number().required(),
+          delivery_charges: Joi.number().required(),
           rating: Joi.number().allow(null, ""),
           start_time: Joi.string().required(),
           end_time: Joi.string().required(),
@@ -63,12 +65,35 @@ module.exports = function businessSchema(opts) {
           image_url: Joi.string().allow(null, ""),
           city_id: Joi.number().required(),
           category_id: Joi.number().required(),
+          location_side_id: Joi.number().required(),
+          store_spec: Joi.string().allow(null, ""),
+          off_days: Joi.string().allow(null, ""),
+          in_city: Joi.boolean().required(),
         }),
       },
       preHandler: async (request, reply) => {
         await fastify.verifyAdminToken(request, reply);
       },
       handler: businessController.addBusiness,
+    };
+  };
+
+  const addBusinessReview = ({ fastify }) => {
+    return {
+      method: "POST",
+      url: "/business/add/review",
+      schema: {
+        body: Joi.object().keys({
+          review: Joi.string().required(),
+          rating: Joi.number().required(),
+          customer_id: Joi.number().required(),
+          business_id: Joi.number().required(),
+        }),
+      },
+      preHandler: async (request, reply) => {
+        await fastify.verifyToken(request, reply);
+      },
+      handler: businessController.addBusinessReview,
     };
   };
 
@@ -84,6 +109,7 @@ module.exports = function businessSchema(opts) {
           address: Joi.string().required(),
           latitude: Joi.number().required(),
           longitude: Joi.number().required(),
+          delivery_charges: Joi.number().required(),
           rating: Joi.number().allow(null, ""),
           start_time: Joi.string().required(),
           end_time: Joi.string().required(),
@@ -91,6 +117,10 @@ module.exports = function businessSchema(opts) {
           image_url: Joi.string().allow(null, ""),
           city_id: Joi.number().required(),
           category_id: Joi.number().required(),
+          location_side_id: Joi.number().required(),
+          store_spec: Joi.string().allow(null, ""),
+          off_days: Joi.string().allow(null, ""),
+          in_city: Joi.boolean().required(),
         }),
       },
       preHandler: async (request, reply) => {
@@ -130,6 +160,7 @@ module.exports = function businessSchema(opts) {
     readByID,
     readFeatured,
     add,
+    addBusinessReview,
     update,
     readByCategory,
     readBySubCategory,

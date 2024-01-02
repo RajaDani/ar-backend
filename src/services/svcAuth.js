@@ -1,3 +1,5 @@
+const mdlBusiness = require("../models/mdlBusiness");
+
 module.exports = function svcAuth(opts) {
   const {
     sequelize,
@@ -8,16 +10,25 @@ module.exports = function svcAuth(opts) {
     Boom,
     mdlCustomerAddress,
     mdlRider,
+    mdlBusiness,
   } = opts;
   const { User } = mdlUser;
   const { Rider } = mdlRider;
-
+  const { Business } = mdlBusiness;
   const { Admin } = mdlAdmin;
   const { CustomerAddress } = mdlCustomerAddress;
 
   async function createUser(params) {
-    const { name, email, password, contact, address_details, lat, lng, city_id } =
-      params;
+    const {
+      name,
+      email,
+      password,
+      contact,
+      address_details,
+      lat,
+      lng,
+      city_id,
+    } = params;
     const emailCheck = await User.count({ where: { email } });
     if (emailCheck > 0) throw Boom.conflict("Email already exists!");
     const contactCheck = await User.count({ where: { contact } });
@@ -31,8 +42,8 @@ module.exports = function svcAuth(opts) {
         email,
         password: pass,
         contact,
-        city_id
-      }).then((data) => userData = JSON.stringify(data));
+        city_id,
+      }).then((data) => (userData = JSON.stringify(data)));
 
       if (user)
         await CustomerAddress.create({
@@ -49,9 +60,11 @@ module.exports = function svcAuth(opts) {
       delete parsedData["updatedAt"];
       delete parsedData["status"];
 
-      if (user) return {
-        msg: "success", user: parsedData
-      };
+      if (user)
+        return {
+          msg: "success",
+          user: parsedData,
+        };
     }
   }
 
@@ -102,9 +115,10 @@ module.exports = function svcAuth(opts) {
         name: user.name,
         email: user.email,
         contact: user.contact,
-        address: user.customer_addresses[0].address_details,
+        address: user.customer_addresses[0]?.address_details,
       };
   }
+
   async function verifyRider(params) {
     const { email, password } = params;
     const pass = encryption.hashPassword(password, config);
@@ -131,6 +145,30 @@ module.exports = function svcAuth(opts) {
         name: rider.name,
         email: rider.email,
         contact: rider.contact,
+        // address: Rider.customer_addresses[0].address_details,
+      };
+  }
+
+  async function verifyBusiness(params) {
+    const { email, password } = params;
+    const pass = encryption.hashPassword(password, config);
+
+    const business = await Business.findOne({
+      where: {
+        email: email,
+        password: pass,
+      },
+    });
+    if (!business) throw Boom.conflict("Incorrect email or password");
+    const token = await encryption.generateToken(business);
+    if (token)
+      return {
+        msg: "success",
+        token,
+        id: business.id,
+        name: business.name,
+        email: business.email,
+        contact: business.contact,
         // address: Rider.customer_addresses[0].address_details,
       };
   }
@@ -166,5 +204,6 @@ module.exports = function svcAuth(opts) {
     verifyAdmin,
     createAdmin,
     verifyRider,
+    verifyBusiness,
   };
 };

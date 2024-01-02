@@ -1,6 +1,6 @@
 module.exports = function mdlUser(opts) {
-  const { sequelize, mdlCategory, sequelizeCon } = opts;
-  const { Category } = mdlCategory;
+  const { sequelize, sequelizeCon, mdlLocationSide } = opts;
+  const { LocationSide } = mdlLocationSide;
   //   const { Item } = mdlItem;
 
   const Business = sequelizeCon.define("business", {
@@ -38,6 +38,14 @@ module.exports = function mdlUser(opts) {
       type: sequelize.STRING,
       allowNull: false,
     },
+    password: {
+      type: sequelize.STRING,
+      allowNull: false,
+    },
+    delivery_charges: {
+      type: sequelize.INTEGER,
+      allowNull: false,
+    },
     rating: {
       type: sequelize.INTEGER,
       allowNull: true,
@@ -62,8 +70,21 @@ module.exports = function mdlUser(opts) {
       type: sequelize.BOOLEAN,
       defaultValue: true,
     },
+    off_days: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
+    in_city: {
+      type: sequelize.BOOLEAN,
+      defaultValue: true,
+    },
+    store_spec: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
   });
 
+  Business.belongsTo(LocationSide, { foreignKey: "location_side_id" });
   // Business.belongsToMany(Category, { through: "business_cateogries" });
   //   Business.hasOne(Item, {
   //     foreignKey: "business_id",

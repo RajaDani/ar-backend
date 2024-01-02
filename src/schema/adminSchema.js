@@ -5,9 +5,9 @@ module.exports = function adminSchema(opts) {
     return {
       method: "GET",
       url: "/admin/read",
-      // preHandler: async (request, reply) => {
-      //   await fastify.verifyAdminToken(request, reply);
-      // },
+      preHandler: async (request, reply) => {
+        await fastify.verifyAdminToken(request, reply);
+      },
       handler: adminController.getAdmins,
     };
   };
@@ -20,6 +20,24 @@ module.exports = function adminSchema(opts) {
         await fastify.verifyAdminToken(request, reply);
       },
       handler: adminController.getAdminByID,
+    };
+  };
+
+  const getRiderBills = ({ fastify }) => {
+    return {
+      method: "POST",
+      url: "/admin/read/bills",
+      schema: {
+        body: Joi.object().keys({
+          business_id: Joi.number().allow(null, ""),
+          rider_id: Joi.number().allow(null, ""),
+          bill_date: Joi.string().allow(null, "")
+        }),
+      },
+      preHandler: async (request, reply) => {
+        await fastify.verifyAdminToken(request, reply);
+      },
+      handler: adminController.getRiderBills,
     };
   };
 
@@ -75,5 +93,16 @@ module.exports = function adminSchema(opts) {
     };
   };
 
-  return { read, readByID, add, update, remove };
+  const removeBill = ({ fastify }) => {
+    return {
+      method: "DELETE",
+      url: "/admin/delete/bill/:id",
+      preHandler: async (request, reply) => {
+        await fastify.verifyAdminToken(request, reply);
+      },
+      handler: adminController.deleteBill,
+    };
+  };
+
+  return { read, readByID, getRiderBills, add, update, remove, removeBill };
 };

@@ -5,7 +5,8 @@ module.exports = function svcCity(opts) {
   async function getCities(params) {
     // sequelizeCon.sync({ force: true });
     const cities = await City.findAll({
-      attributes: ["id", "name", "contact", "status"],
+      attributes: ["id", "name", "contact", "email", "whatsapp",
+        "delivery_timing_start", "delivery_timing_end", "off_day", "delivery_discount", "store_discount"],
       where: {
         status: 1
       }
@@ -15,7 +16,9 @@ module.exports = function svcCity(opts) {
 
   async function getCityByID(params) {
     const city = await City.findOne({
-      attributes: ["id", "name", "contact"],
+      attributes: ["id", "name", "contact", "email", "whatsapp",
+        "delivery_timing_start", "delivery_timing_end", "off_day", "off_condition", "off_start_time",
+        "off_end_time", "delivery_discount", "store_discount"],
       where: {
         id: params.id,
       },

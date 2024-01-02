@@ -21,6 +21,18 @@ module.exports = function mdlUser(opts) {
       type: sequelize.STRING,
       allowNull: true,
     },
+    bachat_card_discount: {
+      type: sequelize.INTEGER,
+      allowNull: true,
+    },
+    student_card_discount: {
+      type: sequelize.INTEGER,
+      allowNull: true,
+    },
+    discount_all_users: {
+      type: sequelize.INTEGER,
+      allowNull: true,
+    },
     status: {
       type: sequelize.BOOLEAN,
       defaultValue: true,

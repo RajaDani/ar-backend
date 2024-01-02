@@ -34,6 +34,34 @@ module.exports = function mdlRider(opts) {
       type: sequelize.STRING,
       allowNull: true,
     },
+    job_type: {
+      type: sequelize.STRING,
+      allowNull: false,
+    },
+    job_start_time: {
+      type: sequelize.STRING,
+      allowNull: false,
+    },
+    job_end_time: {
+      type: sequelize.STRING,
+      allowNull: false,
+    },
+    off_days: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
+    rider_job_start: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
+    rider_job_end: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
+    active: {
+      type: sequelize.BOOLEAN,
+      defaultValue: false,
+    },
     status: {
       type: sequelize.BOOLEAN,
       defaultValue: true,

@@ -63,6 +63,22 @@ module.exports = function mdlUser(opts) {
       type: sequelize.STRING,
       defaultValue: "Pending",
     },
+    order_processing_time: {
+      type: sequelize.BIGINT,
+      allowNull: true,
+    },
+    order_deliver_time: {
+      type: sequelize.BIGINT,
+      allowNull: true,
+    },
+    delivery_time: {
+      type: sequelize.STRING,
+      defaultValue: "30-40 min",
+    },
+    admin_edited: {
+      type: sequelize.BOOLEAN,
+      defaultValue: false,
+    },
     status: {
       type: sequelize.BOOLEAN,
       defaultValue: true,

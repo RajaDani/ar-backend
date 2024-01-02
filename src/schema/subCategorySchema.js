@@ -43,6 +43,9 @@ module.exports = function subCategorySchema(opts) {
           description: Joi.string().allow(null, ""),
           image_url: Joi.string().allow(null, ""),
           category_id: Joi.number().required(),
+          bachat_card_discount: Joi.number().allow(null),
+          student_card_discount: Joi.number().allow(null),
+          discount_all_users: Joi.number().allow(null),
         }),
       },
       preHandler: async (request, reply) => {
@@ -62,6 +65,9 @@ module.exports = function subCategorySchema(opts) {
           description: Joi.string().allow(null, ""),
           image_url: Joi.string().allow(null, ""),
           category_id: Joi.number().required(),
+          bachat_card_discount: Joi.number().allow(null),
+          student_card_discount: Joi.number().allow(null),
+          discount_all_users: Joi.number().allow(null),
         }),
       },
       preHandler: async (request, reply) => {

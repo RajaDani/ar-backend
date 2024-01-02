@@ -1,16 +1,31 @@
 module.exports = function svcArea(opts) {
-    const { sequelize, sequelizeCon, mdlArea, mdlCity } = opts;
+    const { sequelize, sequelizeCon, mdlArea, mdlCity, mdlLocationSide } = opts;
     const { Area } = mdlArea;
     const { City } = mdlCity;
+    const { LocationSide } = mdlLocationSide;
 
     async function getAreas(params) {
-        // sequelizeCon.sync({ force: true });
         const areas = await Area.findAll({
-            attributes: ["id", "name", "delivery_charges"],
+            attributes: ["id", "name", "delivery_charges", "road_issue"],
             include: [{
                 model: City,
                 attributes: ["name"]
-            }],
+            },
+            {
+                model: LocationSide,
+                attributes: ["name"]
+            }
+            ],
+            where: {
+                status: 1
+            }
+        });
+        return areas;
+    }
+
+    async function getLocationSides(params) {
+        const areas = await LocationSide.findAll({
+            attributes: ["id", "name"],
             where: {
                 status: 1
             }
@@ -20,14 +35,21 @@ module.exports = function svcArea(opts) {
 
     async function getAreaByID(params) {
         const area = await Area.findOne({
-            attributes: ["id", "name", "delivery_charges", "city_id"],
+            attributes: ["id", "name", "delivery_charges", "location_side_id", "km_from_city"
+                , "charges_per_km", "road_issue", "city_id"],
             where: {
                 id: params.id,
             },
             include: [{
                 model: City,
                 attributes: ["name"]
-            }]
+            },
+            {
+                model: LocationSide,
+                attributes: ["name"]
+            }
+            ],
+
         });
         return area
     }
@@ -45,6 +67,11 @@ module.exports = function svcArea(opts) {
 
     async function addArea(params) {
         const area = await Area.create(params);
+        return area.id;
+    }
+
+    async function addLocationSide(params) {
+        const area = await LocationSide.create(params);
         return area.id;
     }
 
@@ -76,9 +103,11 @@ module.exports = function svcArea(opts) {
 
     return {
         getAreas,
+        getLocationSides,
         getAreaByID,
         getAreaByCity,
         addArea,
+        addLocationSide,
         updateArea,
         deleteAreaByID
     };

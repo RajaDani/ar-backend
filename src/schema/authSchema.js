@@ -63,10 +63,24 @@ module.exports = function userSchema(opts) {
     };
   };
 
+  const loginBusiness = ({ fastify }) => {
+    return {
+      method: "POST",
+      url: "/business/login",
+      schema: {
+        body: Joi.object().keys({
+          email: Joi.string().required(),
+          password: Joi.string().required(),
+        }),
+      },
+      handler: authController.verifyBusiness,
+    };
+  };
   return {
     login,
     signup,
     loginAdmin,
     loginRider,
+    loginBusiness,
   };
 };

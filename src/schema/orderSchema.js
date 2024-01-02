@@ -11,6 +11,16 @@ module.exports = function orderSchema(opts) {
       handler: orderController.getOrders,
     };
   };
+  const readByBusiness = ({ fastify }) => {
+    return {
+      method: "GET",
+      url: "/business/order/read/:id",
+      // preHandler: async (request, reply) => {
+      //   await fastify.verifyAdminToken(request, reply);
+      // },
+      handler: orderController.getOrdersByBusiness,
+    };
+  };
 
   const readByID = ({ fastify }) => {
     return {
@@ -32,6 +42,7 @@ module.exports = function orderSchema(opts) {
           posted_by: Joi.number().allow(null, ""),
           progress_status: Joi.string().allow(""),
           city_id: Joi.number().allow(null, ""),
+          rider_id: Joi.number().optional().allow(null, ""),
           limit: Joi.number().allow(null),
           offset: Joi.number().allow(null),
         }),
@@ -54,9 +65,11 @@ module.exports = function orderSchema(opts) {
             custom_item: Joi.array()
               .items(
                 Joi.object({
+                  business_id: Joi.number().allow(null, ""),
                   name: Joi.string().allow(null, ""),
                   price: Joi.number().allow(null, ""),
                   quantity: Joi.number().allow(null, ""),
+                  profit: Joi.number().allow(null, ""),
                 })
               )
               .allow(null),
@@ -70,6 +83,7 @@ module.exports = function orderSchema(opts) {
             posted_by: Joi.number().required(),
             custom_order: Joi.string().allow(null, ""),
             progress_status: Joi.string().allow(null, ""),
+            delivery_time: Joi.string().allow(null, ""),
             item: Joi.array().allow(null),
             customer_id: Joi.number().required(),
             address: Joi.string().required(),
@@ -77,6 +91,8 @@ module.exports = function orderSchema(opts) {
             city_id: Joi.number().required(),
             rider_id: Joi.number().allow(null),
             coupon_id: Joi.number().allow(null),
+            order_processing_time: Joi.number().allow(null, ""),
+            order_deliver_time: Joi.number().allow(null, "")
           })
           .unknown(true),
       },
@@ -96,9 +112,11 @@ module.exports = function orderSchema(opts) {
           custom_item: Joi.array()
             .items(
               Joi.object({
+                business_id: Joi.number().allow(null, ""),
                 name: Joi.string().allow(null, ""),
                 price: Joi.number().allow(null, ""),
                 quantity: Joi.number().allow(null, ""),
+                profit: Joi.number().allow(null, ""),
               })
             )
             .allow(null),
@@ -113,6 +131,7 @@ module.exports = function orderSchema(opts) {
           custom_order: Joi.string().allow(null, ""),
           order_bill_image: Joi.string().allow(null, ""),
           progress_status: Joi.string().required(),
+          delivery_time: Joi.string().optional().allow(null, ""),
           item: Joi.array().allow(null),
           customer_id: Joi.number().required(),
           address: Joi.string().required(),
@@ -120,6 +139,9 @@ module.exports = function orderSchema(opts) {
           city_id: Joi.number().required(),
           rider_id: Joi.number().required(),
           coupon_id: Joi.number().allow(null),
+          order_processing_time: Joi.number().allow(null, ""),
+          order_deliver_time: Joi.number().allow(null, ""),
+          admin_edited: Joi.boolean().optional()
         }),
       },
       preHandler: async (request, reply) => {
@@ -137,6 +159,8 @@ module.exports = function orderSchema(opts) {
         body: Joi.object().keys({
           progress_status: Joi.string().allow(null, ""),
           rider_id: Joi.number().allow(null, ""),
+          order_processing_time: Joi.number().optional().allow(null, ""),
+          order_deliver_time: Joi.number().optional().allow(null, ""),
         }),
       },
       preHandler: async (request, reply) => {
@@ -165,5 +189,6 @@ module.exports = function orderSchema(opts) {
     update,
     quickUpdate,
     deleteByID,
+    readByBusiness,
   };
 };

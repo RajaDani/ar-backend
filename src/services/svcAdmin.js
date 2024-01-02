@@ -1,6 +1,9 @@
 module.exports = function svcAdmin(opts) {
-  const { sequelizeCon, mdlAdmin, encryption, config } = opts;
+  const { sequelizeCon, mdlAdmin, encryption, config, mdlRiderBills, mdlBusiness, mdlRider } = opts;
   const { Admin } = mdlAdmin;
+  const { RiderBills } = mdlRiderBills;
+  const { Rider } = mdlRider;
+  const { Business } = mdlBusiness;
 
   async function getAdmins(params) {
     //   Admin.sync({ force: true });
@@ -21,6 +24,29 @@ module.exports = function svcAdmin(opts) {
       },
     });
     return admin;
+  }
+
+  async function getRiderBills(params) {
+    const { business_id, rider_id, bill_date } = params;
+    if (!business_id) delete params["business_id"];
+    if (!rider_id) delete params["rider_id"];
+    if (!bill_date) delete params["bill_date"];
+    params["status"] = 1;
+
+    const bills = await RiderBills.findAll({
+      attributes: ["id", "image", "bill_date"],
+      include: [{
+        model: Business,
+        attributes: ["name"]
+      },
+      {
+        model: Rider,
+        attributes: ["name"]
+      }
+      ],
+      where: params
+    });
+    return bills;
   }
 
   async function addAdmin(params, identity) {
@@ -82,11 +108,27 @@ module.exports = function svcAdmin(opts) {
     return admin;
   }
 
+  async function deleteBill(params) {
+    const bill = await RiderBills.update(
+      {
+        status: 0,
+      },
+      {
+        where: {
+          id: params.id,
+        },
+      }
+    );
+    return bill;
+  }
+
   return {
     getAdmins,
     getAdminByID,
+    getRiderBills,
     addAdmin,
     updateAdmin,
     deleteAdmin,
+    deleteBill
   };
 };

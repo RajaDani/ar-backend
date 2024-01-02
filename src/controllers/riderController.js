@@ -11,8 +11,29 @@ module.exports = function riderController(opts) {
     reply.send({ code: 200, reply: record });
   }
 
+  async function getRiderStats(request, reply) {
+    const record = await svcRider.getRiderStats(request.params);
+    reply.send({ code: 200, reply: record });
+  }
+
+  async function getIndividualRidersOrders(request, reply) {
+    const record = await svcRider.getIndividualRidersOrders();
+    reply.send({ code: 200, reply: record });
+  }
+
+
   async function addRider(request, reply) {
     const record = await svcRider.addRider(request.body);
+    reply.send({ code: 200, reply: record });
+  }
+
+  async function addRiderReview(request, reply) {
+    const record = await svcRider.addRiderReview(request.body);
+    reply.send({ code: 200, reply: record });
+  }
+
+  async function addRiderBills(request, reply) {
+    const record = await svcRider.addRiderBills(request.body);
     reply.send({ code: 200, reply: record });
   }
 
@@ -21,6 +42,13 @@ module.exports = function riderController(opts) {
     const record = await svcRider.updateRider(params, body, identity);
     reply.send({ code: 200, reply: record });
   }
+
+  async function updateRiderStatus(request, reply) {
+    const { params, body } = request;
+    const record = await svcRider.updateRiderStatus(params, body);
+    reply.send({ code: 200, reply: record });
+  }
+
 
   async function deleteRiderByID(request, reply) {
     const record = await svcRider.deleteRiderByID(request.params);
@@ -34,8 +62,13 @@ module.exports = function riderController(opts) {
   return {
     getRiders,
     getRiderByID,
+    getRiderStats,
+    getIndividualRidersOrders,
     addRider,
+    addRiderReview,
+    addRiderBills,
     updateRider,
+    updateRiderStatus,
     deleteRiderByID,
     getRiderOrders,
   };

@@ -31,8 +31,8 @@ module.exports = function appointmentSchema(opts) {
                 body: Joi.object().keys({
                     appointment_fee: Joi.number().required(),
                     platform_fee: Joi.number().required(),
-                    patient_name: Joi.string().allow("", null),
-                    patient_address: Joi.string().allow("", null),
+                    app_holder_name: Joi.string().allow("", null),
+                    app_holder_address: Joi.string().allow("", null),
                     appointment_type: Joi.string().required(),
                     appointment_date: Joi.string().required(),
                     appointment_time: Joi.string().required(),
@@ -58,8 +58,8 @@ module.exports = function appointmentSchema(opts) {
                 body: Joi.object().keys({
                     appointment_fee: Joi.number().required(),
                     platform_fee: Joi.number().required(),
-                    patient_name: Joi.string().allow("", null),
-                    patient_address: Joi.string().allow("", null),
+                    app_holder_name: Joi.string().allow("", null),
+                    app_holder_address: Joi.string().allow("", null),
                     appointment_type: Joi.string().required(),
                     appointment_date: Joi.string().required(),
                     appointment_time: Joi.string().required(),

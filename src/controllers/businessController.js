@@ -30,6 +30,11 @@ module.exports = function businessController(opts) {
     reply.send({ code: 200, reply: record });
   }
 
+  async function addBusinessReview(request, reply) {
+    const record = await svcBusiness.addBusinessReview(request.body);
+    reply.send({ code: 200, reply: record });
+  }
+
   async function updateBusiness(request, reply) {
     const { params, body } = request;
     const record = await svcBusiness.updateBusiness(params, body);
@@ -54,6 +59,7 @@ module.exports = function businessController(opts) {
     getBusinessByID,
     getFeaturedBusiness,
     addBusiness,
+    addBusinessReview,
     updateBusiness,
     getBusinessByCategory,
     getBusinessBySubCategory,

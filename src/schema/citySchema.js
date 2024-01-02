@@ -25,6 +25,16 @@ module.exports = function citySchema(opts) {
         body: Joi.object().keys({
           name: Joi.string().required(),
           contact: Joi.number().allow(null, ""),
+          whatsapp: Joi.number().allow(null, ""),
+          delivery_timing_start: Joi.string().allow(null, ""),
+          delivery_timing_end: Joi.string().allow(null, ""),
+          email: Joi.string().allow(null, ""),
+          off_day: Joi.string().allow(null, ""),
+          off_condition: Joi.string().allow(null, ""),
+          off_start_time: Joi.string().allow(null, ""),
+          off_end_time: Joi.string().allow(null, ""),
+          delivery_discount: Joi.number().allow(null, ""),
+          store_discount: Joi.number().allow(null, ""),
         }),
       },
       preHandler: async (request, reply) => {
@@ -42,6 +52,16 @@ module.exports = function citySchema(opts) {
         body: Joi.object().keys({
           name: Joi.string().required(),
           contact: Joi.number().allow(null, ""),
+          whatsapp: Joi.number().allow(null, ""),
+          delivery_timing_start: Joi.string().allow(null, ""),
+          delivery_timing_end: Joi.string().allow(null, ""),
+          email: Joi.string().allow(null, ""),
+          off_day: Joi.string().allow(null, ""),
+          off_condition: Joi.string().allow(null, ""),
+          off_start_time: Joi.string().allow(null, ""),
+          off_end_time: Joi.string().allow(null, ""),
+          delivery_discount: Joi.number().allow(null, ""),
+          store_discount: Joi.number().allow(null, ""),
         }),
       },
       preHandler: async (request, reply) => {

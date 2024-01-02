@@ -8,7 +8,8 @@ module.exports = function notificationSchema(opts) {
             schema: {
                 body: Joi.object().keys({
                     title: Joi.string().required(),
-                    msg: Joi.string().required()
+                    msg: Joi.string().required(),
+                    image: Joi.string().allow("", null)
                 }),
             },
             preHandler: async (request, reply) => {

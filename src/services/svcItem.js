@@ -130,7 +130,13 @@ module.exports = function svcItem(opts) {
       include: [
         {
           model: Business,
-          attributes: ["id", "name"],
+          attributes: [
+            "id",
+            "name",
+            "in_city",
+            "location_side_id",
+            "delivery_charges",
+          ],
         },
         {
           model: Subcategory,
@@ -158,9 +164,11 @@ module.exports = function svcItem(opts) {
         "price",
         "image_url",
         "description",
-        "item_type",
+        "old_price",
         "variation_data",
+        "item_type",
         "rating",
+        "featured",
       ],
       where: {
         business_id: businessId,
@@ -172,7 +180,13 @@ module.exports = function svcItem(opts) {
         },
         {
           model: Business,
-          attributes: ["id", "name"],
+          attributes: [
+            "id",
+            "name",
+            "in_city",
+            "location_side_id",
+            "delivery_charges",
+          ],
         },
       ],
     });

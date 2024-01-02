@@ -11,6 +11,11 @@ module.exports = function adminController(opts) {
     reply.send({ code: 200, reply: record });
   }
 
+  async function getRiderBills(request, reply) {
+    const record = await svcAdmin.getRiderBills(request.body);
+    reply.send({ code: 200, reply: record });
+  }
+
   async function addAdmin(request, reply) {
     const record = await svcAdmin.addAdmin(request.body, request.identity);
     reply.send({ code: 200, reply: record });
@@ -27,5 +32,10 @@ module.exports = function adminController(opts) {
     reply.send({ code: 200, reply: record });
   }
 
-  return { getAdmins, getAdminByID, addAdmin, updateAdmin, deleteAdmin };
+  async function deleteBill(request, reply) {
+    const record = await svcAdmin.deleteBill(request.params);
+    reply.send({ code: 200, reply: record });
+  }
+
+  return { getAdmins, getAdminByID, getRiderBills, addAdmin, updateAdmin, deleteAdmin, deleteBill };
 };

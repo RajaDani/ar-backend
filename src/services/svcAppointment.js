@@ -15,7 +15,7 @@ module.exports = function svcAppointment(opts) {
             attributes: [
                 "id",
                 "appointment_type",
-                "patient_name",
+                "app_holder_name",
                 "appointment_fee",
                 "platform_fee",
                 "posted_by",
@@ -38,7 +38,7 @@ module.exports = function svcAppointment(opts) {
 
     async function getAppointmentByID(params) {
         const appointment = await Appointment.findOne({
-            attributes: ["id", "patient_name", "patient_address", "appointment_type", "appointment_fee", "platform_fee", "appointment_date", "appointment_time",
+            attributes: ["id", "app_holder_name", "app_holder_address", "appointment_type", "appointment_fee", "platform_fee", "appointment_date", "appointment_time",
                 "appointment_progress", "payment_method", "customer_id", "address", "item_id"],
             where: {
                 id: params.id,

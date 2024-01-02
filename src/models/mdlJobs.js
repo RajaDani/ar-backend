@@ -1,7 +1,7 @@
-module.exports = function mdlUser(opts) {
+module.exports = function mdlJobs(opts) {
   const { sequelize, sequelizeCon } = opts;
 
-  const Category = sequelizeCon.define("category", {
+  const JobsApplications = sequelizeCon.define("jobs_applications", {
     id: {
       type: sequelize.INTEGER,
       autoIncrement: true,
@@ -12,16 +12,20 @@ module.exports = function mdlUser(opts) {
       type: sequelize.STRING,
       allowNull: false,
     },
-    display_title: {
-      type: sequelize.STRING,
-      allowNull: false,
+    contact: {
+      type: sequelize.BIGINT,
+      allowNull: true,
     },
-    description: {
+    cnic: {
+      type: sequelize.BIGINT,
+      allowNull: true,
+    },
+    email: {
       type: sequelize.STRING,
       allowNull: true,
     },
-    numbering: {
-      type: sequelize.INTEGER,
+    job_type: {
+      type: sequelize.STRING,
       allowNull: true,
     },
     image_url: {
@@ -30,11 +34,9 @@ module.exports = function mdlUser(opts) {
     },
     status: {
       type: sequelize.BOOLEAN,
-      defaultValue: true,
-    },
+      defaultValue: true
+    }
   });
 
-  return {
-    Category,
-  };
+  return { JobsApplications };
 };

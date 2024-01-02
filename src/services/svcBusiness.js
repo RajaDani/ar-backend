@@ -2,6 +2,7 @@ module.exports = function svcBusiness(opts) {
   const {
     mdlBusiness,
     mdlCategory,
+    encryption,
     Op,
     sequelize,
     cloudinary,
@@ -9,6 +10,10 @@ module.exports = function svcBusiness(opts) {
     mdlBusinessCity,
     mdlCity,
     mdlItem,
+    config,
+    mdlBusinessReview,
+    mdlLocationSide,
+    Boom,
   } = opts;
   const { Business } = mdlBusiness;
   const { Category } = mdlCategory;
@@ -16,6 +21,8 @@ module.exports = function svcBusiness(opts) {
   const { BusinessCategory } = mdlBusinessCategory;
   const { City } = mdlCity;
   const { Item } = mdlItem;
+  const { LocationSide } = mdlLocationSide;
+  const { BusinessReview } = mdlBusinessReview;
 
   async function getBusinesses(params) {
     const businesses = await Business.findAll({
@@ -27,6 +34,14 @@ module.exports = function svcBusiness(opts) {
         "address",
         "rating",
         "image_url",
+        "off_days",
+        "in_city",
+      ],
+      include: [
+        {
+          model: LocationSide,
+          attributes: ["name"],
+        },
       ],
       where: {
         status: 1,
@@ -42,7 +57,14 @@ module.exports = function svcBusiness(opts) {
       include: [
         {
           model: Business,
-          attributes: ["id", "name", "image_url", "rating", "description"],
+          attributes: [
+            "id",
+            "name",
+            "image_url",
+            "rating",
+            "description",
+            "location_side_id",
+          ],
           where: { status: true },
         },
       ],
@@ -75,6 +97,17 @@ module.exports = function svcBusiness(opts) {
         "address",
         "rating",
         "image_url",
+        "store_spec",
+        "off_days",
+        "in_city",
+        "location_side_id",
+        "delivery_charges",
+      ],
+      include: [
+        {
+          model: LocationSide,
+          attributes: ["name"],
+        },
       ],
       where: {
         id: params.id,
@@ -122,6 +155,9 @@ module.exports = function svcBusiness(opts) {
         "address",
         "rating",
         "image_url",
+        "location_side_id",
+        "off_days",
+        "in_city",
       ],
       where: {
         status: 1,
@@ -137,7 +173,11 @@ module.exports = function svcBusiness(opts) {
     delete params["image_url"];
     delete params["category_id"];
     delete params["city_id"];
-
+    const { email, password } = params;
+    const count = await Business.count({ where: { email: email } });
+    if (count > 0) throw Boom.conflict("Email already exists!");
+    const pass = encryption.hashPassword(password, config);
+    params.password = pass;
     if (image_url) {
       const { secure_url } = await cloudinary.v2.uploader.upload(image_url);
       params["image_url"] = secure_url;
@@ -154,6 +194,11 @@ module.exports = function svcBusiness(opts) {
       });
     }
     return business;
+  }
+
+  async function addBusinessReview(params) {
+    const review = await BusinessReview.create(params);
+    return review.id;
   }
 
   async function updateBusiness(params, data) {
@@ -225,7 +270,15 @@ module.exports = function svcBusiness(opts) {
       include: [
         {
           model: Business,
-          attributes: ["id", "name", "image_url", "rating", "description"],
+          attributes: [
+            "id",
+            "name",
+            "image_url",
+            "rating",
+            "description",
+            "off_days",
+            "in_city",
+          ],
           where: {
             name: {
               [Op.like]: `%${name}%`,
@@ -252,6 +305,8 @@ module.exports = function svcBusiness(opts) {
         "address",
         "rating",
         "image_url",
+        "off_days",
+        "in_city",
       ],
       where: {
         name: {
@@ -270,6 +325,7 @@ module.exports = function svcBusiness(opts) {
     getBusinessByID,
     getFeaturedBusiness,
     addBusiness,
+    addBusinessReview,
     updateBusiness,
     deleteBusinessByID,
     searchBusinessByCategory,
