@@ -39,5 +39,40 @@ module.exports = function Encryption(opts) {
     if (token) return token;
   }
 
-  return { hashPassword, generateToken, generateAdminToken };
+  async function generateRiderToken(data) {
+    const privateKey = config.get("jwt").secret;
+    const token = JWT.sign(
+      {
+        name: data.name,
+        email: data.email,
+        id: data.id,
+        contact: data.contact,
+        role: "rider"
+      },
+      privateKey,
+      {
+        expiresIn: "1d",
+      }
+    );
+    if (token) return token;
+  }
+
+  async function generateBusinessToken(data) {
+    const privateKey = config.get("jwt").secret;
+    const token = JWT.sign(
+      {
+        name: data.name,
+        email: data.email,
+        id: data.id,
+        role: "business"
+      },
+      privateKey,
+      {
+        expiresIn: "15d",
+      }
+    );
+    if (token) return token;
+  }
+
+  return { hashPassword, generateToken, generateAdminToken, generateRiderToken, generateBusinessToken };
 };

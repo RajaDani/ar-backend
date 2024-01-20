@@ -14,6 +14,11 @@ module.exports = function svcBusiness(opts) {
     mdlBusinessReview,
     mdlLocationSide,
     Boom,
+    mdlUser,
+    mdlOrderItems,
+    sequelizeCon,
+    nodemailer,
+    mdlAdmin,
   } = opts;
   const { Business } = mdlBusiness;
   const { Category } = mdlCategory;
@@ -23,6 +28,9 @@ module.exports = function svcBusiness(opts) {
   const { Item } = mdlItem;
   const { LocationSide } = mdlLocationSide;
   const { BusinessReview } = mdlBusinessReview;
+  const { User } = mdlUser;
+  const { OrderItem } = mdlOrderItems;
+  const { Admin } = mdlAdmin;
 
   async function getBusinesses(params) {
     const businesses = await Business.findAll({
@@ -36,6 +44,14 @@ module.exports = function svcBusiness(opts) {
         "image_url",
         "off_days",
         "in_city",
+        "discount_alloted",
+        "youtube_link",
+        [
+          sequelize.literal(
+            "(SELECT COUNT(DISTINCT `order_id`) FROM `order_items` WHERE `order_items`.`business_id` = `business`.`id`)"
+          ),
+          "total_orders",
+        ],
       ],
       include: [
         {
@@ -46,8 +62,45 @@ module.exports = function svcBusiness(opts) {
       where: {
         status: 1,
       },
+      order: [["ordering_num", "ASC"]],
     });
     return businesses;
+  }
+
+  async function joinBusinessRequest(body) {
+    const admins = await Admin.findAll({
+      attributes: ["email"],
+      where: { status: 1 },
+      raw: true,
+    });
+
+    const emails = admins.map((x) => x.email);
+    const smtp = config.get("smtpConfig");
+    const transporter = nodemailer.createTransport(smtp);
+    const emailList = emails.toString();
+
+    try {
+      await transporter.sendMail({
+        from: `AR Home Services" <arhomeservices@gmail.com>`,
+        to: `${emailList}`,
+        subject: `New Business Add Request!`,
+        html:
+          `<b>New Business "${body.business_name}" requested to join AR Home Services.</b>` +
+          `<ul>
+          <li>Name : ${body.business_name}</li>
+          <li>Owner Name : ${body.business_owner_name}</li>
+          <li>Address : ${body.address}</li>
+          <li>Google Location : ${body.google_location}</li>
+          <li>Business Category : ${body.business_category}</li>
+          <li>Type of Items : ${body.item_types}</li>
+          <li>Contact 1 : ${body.contact_1}</li>
+          <li>Contact 2 : ${body.contact_2}</li>
+          <li>Business timings : ${body.business_timings}</li>
+          </ul>`,
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async function getBusinessByCategory(params) {
@@ -64,8 +117,17 @@ module.exports = function svcBusiness(opts) {
             "rating",
             "description",
             "location_side_id",
+            "discount_alloted",
+            "youtube_link",
+            [
+              sequelize.literal(
+                "(SELECT COUNT(DISTINCT `order_id`) FROM `order_items` WHERE `order_items`.`business_id` = `business`.`id`)"
+              ),
+              "total_orders",
+            ],
           ],
           where: { status: true },
+          order: [["ordering_num", "ASC"]],
         },
       ],
       where: { category_id: categoryId },
@@ -102,6 +164,8 @@ module.exports = function svcBusiness(opts) {
         "in_city",
         "location_side_id",
         "delivery_charges",
+        "discount_alloted",
+        "youtube_link",
       ],
       include: [
         {
@@ -132,6 +196,23 @@ module.exports = function svcBusiness(opts) {
     return business;
   }
 
+  async function getBusinessReviews(params) {
+    const reviews = await BusinessReview.findAll({
+      include: [
+        {
+          model: Business,
+          attributes: ["name"],
+        },
+        {
+          model: User,
+          attributes: ["name"],
+        },
+      ],
+      where: { status: 1 },
+    });
+    return reviews;
+  }
+
   async function getBusinessBySubCategory(params) {
     const { subCategoryId } = params;
     const ids = await Item.findAll({
@@ -139,6 +220,7 @@ module.exports = function svcBusiness(opts) {
         sequelize.fn("DISTINCT", sequelize.col("business_id")),
         "business_id",
       ],
+
       where: {
         subcategory_id: subCategoryId,
         status: 1,
@@ -146,23 +228,18 @@ module.exports = function svcBusiness(opts) {
       raw: true,
     });
     const businessIds = ids.map((item) => item.business_id);
-    const businesses = await Business.findAll({
-      attributes: [
-        "id",
-        "name",
-        "email",
-        "contact",
-        "address",
-        "rating",
-        "image_url",
-        "location_side_id",
-        "off_days",
-        "in_city",
-      ],
-      where: {
-        status: 1,
-        id: { [Op.in]: businessIds },
-      },
+
+    const query =
+      `SELECT b.id,b.name,b.email,b.youtube_link,b.ordering_num,b.contact,b.address,b.rating,b.image_url,b.location_side_id,b.discount_alloted, ` +
+      `b.off_days,b.in_city,  COUNT(DISTINCT oi.order_id) AS total_orders ` +
+      `FROM businesses AS b ` +
+      `LEFT JOIN order_items oi ON oi.business_id = b.id ` +
+      `WHERE b.status = 1 AND b.id IN (${businessIds}) ` +
+      `GROUP BY b.id, b.name, b.email, b.contact, b.address, b.rating, b.image_url, b.location_side_id, b.off_days, b.in_city ` +
+      `ORDER BY b.ordering_num ASC`;
+
+    const businesses = await sequelizeCon.query(query, {
+      type: sequelize.QueryTypes.SELECT,
     });
 
     return businesses;
@@ -199,6 +276,22 @@ module.exports = function svcBusiness(opts) {
   async function addBusinessReview(params) {
     const review = await BusinessReview.create(params);
     return review.id;
+  }
+
+  async function readBusinessReview(params) {
+    const { business_id } = params;
+    console.log("business_id", business_id);
+    const reviews = await BusinessReview.findAll({
+      attributes: ["id", "title", "description", "rating"],
+      where: { business_id },
+      include: [
+        {
+          model: User,
+          attributes: ["id", "name"],
+        },
+      ],
+    });
+    return reviews;
   }
 
   async function updateBusiness(params, data) {
@@ -240,6 +333,13 @@ module.exports = function svcBusiness(opts) {
     );
     return business;
   }
+
+  async function deleteBusinessReview(params) {
+    const business = await BusinessReview.destroy({
+      where: { id: params.id },
+    });
+    return business;
+  }
   // async function searchBusiness(params) {
   //   const { name } = params;
 
@@ -278,6 +378,12 @@ module.exports = function svcBusiness(opts) {
             "description",
             "off_days",
             "in_city",
+            [
+              sequelize.literal(
+                "(SELECT COUNT(DISTINCT `order_id`) FROM `order_items` WHERE `order_items`.`business_id` = `business`.`id`)"
+              ),
+              "total_orders",
+            ],
           ],
           where: {
             name: {
@@ -307,6 +413,13 @@ module.exports = function svcBusiness(opts) {
         "image_url",
         "off_days",
         "in_city",
+        "ordering_num",
+        [
+          sequelize.literal(
+            "(SELECT COUNT(DISTINCT `order_id`) FROM `order_items` WHERE `order_items`.`business_id` = `business`.`id`)"
+          ),
+          "total_orders",
+        ],
       ],
       where: {
         name: {
@@ -314,6 +427,7 @@ module.exports = function svcBusiness(opts) {
         },
         status: 1,
       },
+      order: [["ordering_num", "ASC"]],
     });
 
     return businesses;
@@ -322,13 +436,17 @@ module.exports = function svcBusiness(opts) {
     getBusinesses,
     getBusinessByCategory,
     getBusinessBySubCategory,
+    getBusinessReviews,
     getBusinessByID,
     getFeaturedBusiness,
     addBusiness,
     addBusinessReview,
     updateBusiness,
     deleteBusinessByID,
+    deleteBusinessReview,
     searchBusinessByCategory,
     searchBusiness,
+    readBusinessReview,
+    joinBusinessRequest,
   };
 };

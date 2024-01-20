@@ -11,13 +11,14 @@ module.exports = function orderSchema(opts) {
       handler: orderController.getOrders,
     };
   };
+
   const readByBusiness = ({ fastify }) => {
     return {
       method: "GET",
       url: "/business/order/read/:id",
-      // preHandler: async (request, reply) => {
-      //   await fastify.verifyAdminToken(request, reply);
-      // },
+      preHandler: async (request, reply) => {
+        await fastify.verifyBusinessToken(request, reply);
+      },
       handler: orderController.getOrdersByBusiness,
     };
   };
@@ -70,6 +71,7 @@ module.exports = function orderSchema(opts) {
                   price: Joi.number().allow(null, ""),
                   quantity: Joi.number().allow(null, ""),
                   profit: Joi.number().allow(null, ""),
+                  item_picked: Joi.boolean().optional()
                 })
               )
               .allow(null),
@@ -92,7 +94,8 @@ module.exports = function orderSchema(opts) {
             rider_id: Joi.number().allow(null),
             coupon_id: Joi.number().allow(null),
             order_processing_time: Joi.number().allow(null, ""),
-            order_deliver_time: Joi.number().allow(null, "")
+            order_deliver_time: Joi.number().allow(null, ""),
+            hold_order_till: Joi.number().optional().allow(null)
           })
           .unknown(true),
       },
@@ -117,6 +120,7 @@ module.exports = function orderSchema(opts) {
                 price: Joi.number().allow(null, ""),
                 quantity: Joi.number().allow(null, ""),
                 profit: Joi.number().allow(null, ""),
+                item_picked: Joi.boolean().optional()
               })
             )
             .allow(null),
@@ -141,7 +145,8 @@ module.exports = function orderSchema(opts) {
           coupon_id: Joi.number().allow(null),
           order_processing_time: Joi.number().allow(null, ""),
           order_deliver_time: Joi.number().allow(null, ""),
-          admin_edited: Joi.boolean().optional()
+          admin_edited: Joi.boolean().optional(),
+          hold_order_till: Joi.number().optional().allow(null)
         }),
       },
       preHandler: async (request, reply) => {

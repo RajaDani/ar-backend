@@ -49,6 +49,10 @@ module.exports = function mdlCity(opts) {
       type: sequelize.STRING,
       allowNull: true,
     },
+    delivery_charges: {
+      type: sequelize.INTEGER,
+      allowNull: true,
+    },
     delivery_discount: {
       type: sequelize.INTEGER,
       allowNull: true,
@@ -61,9 +65,27 @@ module.exports = function mdlCity(opts) {
       type: sequelize.BOOLEAN,
       defaultValue: true,
     },
+    bachat_card_delivery_discount: {
+      type: sequelize.INTEGER,
+      defaultValue: 0,
+    },
+    student_card_delivery_discount: {
+      type: sequelize.INTEGER,
+      defaultValue: 0,
+    },
+    fb_link: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
+    insta_link: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
+    youtube_link: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
   });
-
-  // City.belongsToMany(Business, { through: "business_cities" });
 
   return { City };
 };

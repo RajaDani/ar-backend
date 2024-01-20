@@ -56,6 +56,75 @@ function jwtMiddleware(fastify, opts, next) {
       }
     }
   );
+
+  fastify.decorate(
+    "verifyRiderToken",
+    async function verifyAdminToken(req, reply, next) {
+      const { JWT, config, logger } = fastify.di().cradle;
+
+      const privateKey = config.get("jwt").secret;
+
+      logger.info("headlocker initailized");
+      try {
+        const header = req.headers["authorization"];
+        if (typeof header !== "undefined") {
+          let bearerHeader = header.split(" ");
+          let token = bearerHeader[1];
+
+          const data = JWT.verify(token, privateKey, (err, dec) => {
+            if (err || dec.role !== "rider") {
+              err.message = "token expire"
+              reply.code(403).send(err)
+            }
+            else {
+              req.identity = dec
+            }
+          });
+
+        } else {
+          reply.code(403).send({ message: "Authorization header missing" });
+        }
+      } catch (err) {
+        err.message = "Forbidden"
+        throw reply.code(403).send(err)
+      }
+    }
+  );
+
+  fastify.decorate(
+    "verifyBusinessToken",
+    async function verifyAdminToken(req, reply, next) {
+      const { JWT, config, logger } = fastify.di().cradle;
+
+      const privateKey = config.get("jwt").secret;
+
+      logger.info("headlocker initailized");
+      try {
+        const header = req.headers["authorization"];
+        if (typeof header !== "undefined") {
+          let bearerHeader = header.split(" ");
+          let token = bearerHeader[1];
+
+          const data = JWT.verify(token, privateKey, (err, dec) => {
+            if (err || dec.role !== "business") {
+              err.message = "token expire"
+              reply.code(403).send(err)
+            }
+            else {
+              req.identity = dec
+            }
+          });
+
+        } else {
+          reply.code(403).send({ message: "Authorization header missing" });
+        }
+      } catch (err) {
+        err.message = "Forbidden"
+        throw reply.code(403).send(err)
+      }
+    }
+  );
+
   next();
 }
 

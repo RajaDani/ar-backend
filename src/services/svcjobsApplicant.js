@@ -3,7 +3,9 @@ module.exports = function svcRider(opts) {
   const { JobsApplications } = mdlJobs;
 
   async function getApplications() {
-    const applications = await JobsApplications.findAll({ where: { status: 1 } })
+    const applications = await JobsApplications.findAll({
+      where: { status: 1 },
+    });
     return applications;
   }
 
@@ -11,7 +13,7 @@ module.exports = function svcRider(opts) {
     const { name, cnic, job_type, image_url } = params;
     // sequelizeCon.sync();
     delete params["image_url"];
-    const count = JobsApplications.findOne({
+    const count = await JobsApplications.findOne({
       where: { cnic, job_type },
     });
     if (count) throw Boom.conflict("Your application is already submitted!");
@@ -26,7 +28,10 @@ module.exports = function svcRider(opts) {
   }
 
   async function removeApplication(params) {
-    const application = await JobsApplications.update({ status: 0 }, { where: { id: params.id } })
+    const application = await JobsApplications.update(
+      { status: 0 },
+      { where: { id: params.id } }
+    );
     return application;
   }
 

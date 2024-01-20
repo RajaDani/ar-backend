@@ -12,14 +12,18 @@ module.exports = function mdlRiderReview(opts) {
             allowNull: false,
             primaryKey: true,
         },
-        review: {
+        title: {
+            type: sequelize.STRING,
+            allowNull: false,
+        },
+        description: {
             type: sequelize.STRING,
             allowNull: false,
         },
         rating: {
             type: sequelize.INTEGER,
             allowNull: true,
-        }
+        },
     });
 
     RiderReview.belongsTo(Rider, { foreignKey: "rider_id" });

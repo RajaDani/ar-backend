@@ -34,7 +34,7 @@ module.exports = function svcAdmin(opts) {
     params["status"] = 1;
 
     const bills = await RiderBills.findAll({
-      attributes: ["id", "image", "bill_date"],
+      attributes: ["id", "image", "bill_date", "total_amount", "bill_id", "createdAt"],
       include: [{
         model: Business,
         attributes: ["name"]

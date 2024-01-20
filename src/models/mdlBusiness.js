@@ -82,6 +82,22 @@ module.exports = function mdlUser(opts) {
       type: sequelize.STRING,
       allowNull: true,
     },
+    store_discount: {
+      type: sequelize.INTEGER,
+      allowNull: true,
+    },
+    discount_alloted: {
+      type: sequelize.BOOLEAN,
+      defaultValue: false,
+    },
+    youtube_link: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
+    ordering_num: {
+      type: sequelize.INTEGER,
+      defaultValue: 1,
+    }
   });
 
   Business.belongsTo(LocationSide, { foreignKey: "location_side_id" });

@@ -21,6 +21,10 @@ module.exports = function riderController(opts) {
     reply.send({ code: 200, reply: record });
   }
 
+  async function getRiderReviews(request, reply) {
+    const record = await svcRider.getRiderReviews();
+    reply.send({ code: 200, reply: record });
+  }
 
   async function addRider(request, reply) {
     const record = await svcRider.addRider(request.body);
@@ -49,6 +53,10 @@ module.exports = function riderController(opts) {
     reply.send({ code: 200, reply: record });
   }
 
+  async function deleteRiderReview(request, reply) {
+    const record = await svcRider.deleteRiderReview(request.params);
+    reply.send({ code: 200, reply: record });
+  }
 
   async function deleteRiderByID(request, reply) {
     const record = await svcRider.deleteRiderByID(request.params);
@@ -64,12 +72,14 @@ module.exports = function riderController(opts) {
     getRiderByID,
     getRiderStats,
     getIndividualRidersOrders,
+    getRiderReviews,
     addRider,
     addRiderReview,
     addRiderBills,
     updateRider,
     updateRiderStatus,
     deleteRiderByID,
+    deleteRiderReview,
     getRiderOrders,
   };
 };

@@ -1,4 +1,4 @@
-module.exports = function citySchema(opts) {
+module.exports = function fcmSchema(opts) {
   const { fcmController, Joi } = opts;
 
   const read = ({ fastify }) => {

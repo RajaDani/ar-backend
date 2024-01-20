@@ -27,6 +27,7 @@ module.exports = function areaController(opts) {
     }
 
     async function addLocationSide(request, reply) {
+
         const record = await svcArea.addLocationSide(request.body);
         reply.send({ code: 200, reply: record });
     }

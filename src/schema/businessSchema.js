@@ -44,6 +44,14 @@ module.exports = function businessSchema(opts) {
     };
   };
 
+  const readReviews = ({ fastify }) => {
+    return {
+      method: "GET",
+      url: "/business/read/reviews",
+      handler: businessController.getBusinessReviews,
+    };
+  };
+
   const add = ({ fastify }) => {
     return {
       method: "POST",
@@ -69,6 +77,9 @@ module.exports = function businessSchema(opts) {
           store_spec: Joi.string().allow(null, ""),
           off_days: Joi.string().allow(null, ""),
           in_city: Joi.boolean().required(),
+          discount_alloted: Joi.boolean().optional(),
+          youtube_link: Joi.string().allow(null, ""),
+          ordering_num: Joi.number().allow(null, ""),
         }),
       },
       preHandler: async (request, reply) => {
@@ -84,7 +95,8 @@ module.exports = function businessSchema(opts) {
       url: "/business/add/review",
       schema: {
         body: Joi.object().keys({
-          review: Joi.string().required(),
+          title: Joi.string().required(),
+          description: Joi.string().allow(null, ""),
           rating: Joi.number().required(),
           customer_id: Joi.number().required(),
           business_id: Joi.number().required(),
@@ -97,6 +109,34 @@ module.exports = function businessSchema(opts) {
     };
   };
 
+  const joinBusinessRequest = ({ fastify }) => {
+    return {
+      method: "POST",
+      url: "/business/join/request",
+      schema: {
+        body: Joi.object().keys({
+          business_name: Joi.string().required(),
+          business_owner_name: Joi.string().required(),
+          address: Joi.string().required(),
+          google_location: Joi.string().required(),
+          business_category: Joi.string().required(),
+          item_types: Joi.string().required(),
+          contact_1: Joi.number().required(),
+          contact_2: Joi.number().required(),
+          business_timings: Joi.string().required()
+        }),
+      },
+      handler: businessController.joinBusinessRequest,
+    };
+  };
+
+  const readBusinessReview = ({ fastify }) => {
+    return {
+      method: "GET",
+      url: "/business/review/read/:business_id",
+      handler: businessController.readBusinessReview,
+    };
+  };
   const update = ({ fastify }) => {
     return {
       method: "PUT",
@@ -121,6 +161,9 @@ module.exports = function businessSchema(opts) {
           store_spec: Joi.string().allow(null, ""),
           off_days: Joi.string().allow(null, ""),
           in_city: Joi.boolean().required(),
+          discount_alloted: Joi.boolean().optional(),
+          youtube_link: Joi.string().allow(null, ""),
+          ordering_num: Joi.number().allow(null, ""),
         }),
       },
       preHandler: async (request, reply) => {
@@ -140,6 +183,18 @@ module.exports = function businessSchema(opts) {
       handler: businessController.deleteBusinessByID,
     };
   };
+
+  const deleteReviewByID = ({ fastify }) => {
+    return {
+      method: "DELETE",
+      url: "/business/delete/review/:id",
+      preHandler: async (request, reply) => {
+        await fastify.verifyAdminToken(request, reply);
+      },
+      handler: businessController.deleteBusinessReview,
+    };
+  };
+
   const searchBusiness = ({ fastify }) => {
     return {
       method: "GET",
@@ -147,6 +202,7 @@ module.exports = function businessSchema(opts) {
       handler: businessController.searchBusiness,
     };
   };
+
   const searchBusinessByCategory = ({ fastify }) => {
     return {
       method: "GET",
@@ -159,13 +215,17 @@ module.exports = function businessSchema(opts) {
     read,
     readByID,
     readFeatured,
+    readReviews,
     add,
     addBusinessReview,
+    readBusinessReview,
     update,
     readByCategory,
     readBySubCategory,
     deleteByID,
+    deleteReviewByID,
     searchBusiness,
     searchBusinessByCategory,
+    joinBusinessRequest
   };
 };

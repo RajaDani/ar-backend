@@ -40,12 +40,13 @@ module.exports = function areaSchema(opts) {
             schema: {
                 body: Joi.object().keys({
                     name: Joi.string().required(),
-                    delivery_charges: Joi.string().required(),
+                    delivery_charges: Joi.number().required(),
                     city_id: Joi.number().required(),
                     location_side_id: Joi.number().required(),
                     km_from_city: Joi.number().allow("", null),
                     charges_per_km: Joi.number().allow("", null),
                     road_issue: Joi.boolean().allow(0, 1),
+                    in_city: Joi.boolean().allow(0, 1)
                 }),
             },
             preHandler: async (request, reply) => {
@@ -78,12 +79,13 @@ module.exports = function areaSchema(opts) {
             schema: {
                 body: Joi.object().keys({
                     name: Joi.string().required(),
-                    delivery_charges: Joi.string().required(),
+                    delivery_charges: Joi.number().required(),
                     city_id: Joi.number().required(),
                     location_side_id: Joi.number().required(),
                     km_from_city: Joi.number().allow("", null),
                     charges_per_km: Joi.number().allow("", null),
                     road_issue: Joi.boolean().allow(0, 1),
+                    in_city: Joi.boolean().allow(0, 1)
                 }),
             },
             preHandler: async (request, reply) => {

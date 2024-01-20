@@ -1,6 +1,7 @@
 const fastify = require("fastify");
 // const fastifyJWT = require("@fastify/jwt");
 const fastifyCors = require("@fastify/cors")
+const cronjob = require("../scheduler/cron");
 
 const config = require("./config");
 const di = require("./di");
@@ -54,6 +55,7 @@ module.exports = async function FastServer(options) {
     const _container = await _di._container();
 
     await decorateServer("di", () => _container);
+    await cronjob(_container.cradle);
 
     _server.setValidatorCompiler(
       ({ schema, method, url, httpPart }) =>

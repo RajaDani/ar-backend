@@ -29,6 +29,10 @@ module.exports = function mdlUser(opts) {
             type: sequelize.BOOLEAN,
             defaultValue: false,
         },
+        in_city: {
+            type: sequelize.BOOLEAN,
+            defaultValue: false,
+        },
         status: {
             type: sequelize.BOOLEAN,
             defaultValue: true,

@@ -79,6 +79,10 @@ module.exports = function mdlUser(opts) {
       type: sequelize.BOOLEAN,
       defaultValue: false,
     },
+    hold_order_till:{
+      type: sequelize.STRING,
+      allowNull: true,
+    },
     status: {
       type: sequelize.BOOLEAN,
       defaultValue: true,

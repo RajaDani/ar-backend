@@ -10,12 +10,14 @@ module.exports = function svcRider(opts) {
     cloudinary,
     mdlCity,
     mdlRiderReview,
-    mdlRiderBills
+    mdlRiderBills,
+    mdlUser
   } = opts;
   const { Rider } = mdlRider;
   const { City } = mdlCity;
   const { RiderReview } = mdlRiderReview;
   const { RiderBills } = mdlRiderBills;
+  const { User } = mdlUser;
 
   async function getRiders(params) {
     // sequelizeCon.sync({ force: true });
@@ -61,6 +63,22 @@ module.exports = function svcRider(opts) {
     return rider;
   }
 
+  async function getRiderReviews(params) {
+    const reviews = await RiderReview.findAll({
+      include: [{
+        model: Rider,
+        attributes: ["name"]
+      },
+      {
+        model: User,
+        attributes: ["name"]
+      }
+      ],
+      where: { status: 1 },
+    });
+    return reviews;
+  }
+
   async function addRider(params) {
     const { image_url, password } = params;
     delete params["image_url"];
@@ -85,7 +103,6 @@ module.exports = function svcRider(opts) {
   async function addRiderBills(params) {
     const { image } = params;
     delete params["image"];
-    RiderBills.sync();
     if (image) {
       const { secure_url } = await cloudinary.v2.uploader.upload(image);
       params["image"] = secure_url;
@@ -127,23 +144,23 @@ module.exports = function svcRider(opts) {
 
   async function deleteRiderByID(params) {
     const rider = await Rider.update(
-      {
-        status: 0,
-      },
-      {
-        where: {
-          id: params.id,
-        },
-      }
+      { status: 0 },
+      { where: { id: params.id } }
     );
     return rider;
   }
+
+  async function deleteRiderReview(params) {
+    const rider = await RiderReview.destroy({ where: { id: params.id } });
+    return rider;
+  }
+
   async function getRiderOrders(params) {
     const { id } = params;
 
     const sql = `SELECT o.id,o.total,o.createdAt,CASE WHEN o.posted_by = 1 THEN 'Client'
     WHEN o.posted_by = 2 THEN 'Admin' ELSE o.posted_by END AS posted_by,o.progress_status,o.address,
-    c.name AS city_name,GROUP_CONCAT(oi.item_id) AS item_ids,GROUP_CONCAT(it.name) AS item_names,
+    c.name AS city_name,GROUP_CONCAT(oi.item_id) AS item_ids,GROUP_CONCAT(oi.order_item_name) AS item_names,
     GROUP_CONCAT(b.name) AS business_names,r.name AS rider_name 
     FROM orders AS o 
     LEFT JOIN order_items AS oi ON oi.order_id = o.id 
@@ -238,12 +255,14 @@ module.exports = function svcRider(opts) {
     getRiders,
     getRiderByID,
     getIndividualRidersOrders,
+    getRiderReviews,
     addRider,
     addRiderReview,
     addRiderBills,
     updateRider,
     updateRiderStatus,
     deleteRiderByID,
+    deleteRiderReview,
     getRiderOrders,
     getRiderStats
   };

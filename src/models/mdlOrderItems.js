@@ -27,6 +27,14 @@ module.exports = function mdlUser(opts) {
       type: sequelize.INTEGER,
       allowNull: true,
     },
+    item_picked: {
+      type: sequelize.BOOLEAN,
+      defaultValue: false,
+    },
+    picked_at: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
   }, {
     indexes: [
       {

@@ -11,6 +11,7 @@ const firebase = require("../adapter/firebase");
 const cloudinary = require('cloudinary');
 const Boom = require("boom")
 const nodemailer = require("nodemailer");
+const axios = require("axios");
 
 module.exports = async function FastDI(options = {}) {
   const logger = _.get(options, "logger", undefined);
@@ -41,7 +42,8 @@ module.exports = async function FastDI(options = {}) {
     cloudinary: awilix.asValue(cloudinary),
     Boom: awilix.asValue(Boom),
     firebase: awilix.asValue(firebase),
-    nodemailer: awilix.asValue(nodemailer)
+    nodemailer: awilix.asValue(nodemailer),
+    axios: awilix.asValue(axios)
   });
 
   container.loadModules(
@@ -52,6 +54,7 @@ module.exports = async function FastDI(options = {}) {
       "../schema/**/*.js",
       "../controllers/**/*.js",
       "../middleware/**/*.js",
+      // "../scheduler/**/*.js",
     ],
     {
       cwd: __dirname,

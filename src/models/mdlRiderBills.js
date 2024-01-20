@@ -19,6 +19,14 @@ module.exports = function mdlOrderBills(opts) {
             type: sequelize.STRING,
             allowNull: false
         },
+        total_amount : {
+            type: sequelize.INTEGER,
+            allowNull: false
+        },
+        bill_id : {
+            type: sequelize.STRING,
+            allowNull: true
+        },
         status: {
             type: sequelize.BOOLEAN,
             defaultValue: true

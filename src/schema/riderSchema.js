@@ -45,6 +45,14 @@ module.exports = function riderSchema(opts) {
     };
   };
 
+  const readReviews = ({ fastify }) => {
+    return {
+      method: "GET",
+      url: "/rider/read/reviews",
+      handler: riderController.getRiderReviews,
+    };
+  };
+
   const add = ({ fastify }) => {
     return {
       method: "POST",
@@ -76,17 +84,19 @@ module.exports = function riderSchema(opts) {
       method: "POST",
       url: "/rider/add/bill",
       schema: {
-        body: Joi.object()
-          .keys({
-            image: Joi.string().required(),
-            bill_date: Joi.string().required(),
-            rider_id: Joi.number().required(),
-            business_id: Joi.number().required()
-          })
+        body: Joi.object().keys({
+          image: Joi.string().required(),
+          bill_date: Joi.string().required(),
+          total_amount: Joi.number().required(),
+          bill_id: Joi.string().allow(null, ""),
+          bill_date: Joi.string().required(),
+          rider_id: Joi.number().required(),
+          business_id: Joi.number().required(),
+        }),
       },
-      // preHandler: async (request, reply) => {
-      //   await fastify.verifyAdminToken(request, reply);
-      // },
+      preHandler: async (request, reply) => {
+        await fastify.verifyRiderToken(request, reply);
+      },
       handler: riderController.addRiderBills,
     };
   };
@@ -97,11 +107,12 @@ module.exports = function riderSchema(opts) {
       url: "/rider/add/review",
       schema: {
         body: Joi.object().keys({
-          review: Joi.string().required(),
+          title: Joi.string().required(),
+          description: Joi.string().allow(null, ""),
           rating: Joi.number().required(),
           customer_id: Joi.number().required(),
-          rider_id: Joi.number().required(),
           order_id: Joi.number().required(),
+          rider_id: Joi.number().required(),
         }),
       },
       preHandler: async (request, reply) => {
@@ -130,7 +141,7 @@ module.exports = function riderSchema(opts) {
         }),
       },
       preHandler: async (request, reply) => {
-        await fastify.verifyAdminToken(request, reply);
+        await fastify.verifyToken(request, reply);
       },
       handler: riderController.updateRider,
     };
@@ -151,7 +162,7 @@ module.exports = function riderSchema(opts) {
         }),
       },
       preHandler: async (request, reply) => {
-        await fastify.verifyToken(request, reply);
+        await fastify.verifyRiderToken(request, reply);
       },
       handler: riderController.updateRiderStatus,
     };
@@ -167,13 +178,25 @@ module.exports = function riderSchema(opts) {
       handler: riderController.deleteRiderByID,
     };
   };
+
+  const deleteReviewByID = ({ fastify }) => {
+    return {
+      method: "DELETE",
+      url: "/rider/delete/review/:id",
+      preHandler: async (request, reply) => {
+        await fastify.verifyAdminToken(request, reply);
+      },
+      handler: riderController.deleteRiderReview,
+    };
+  };
+
   const getRiderOrders = ({ fastify }) => {
     return {
       method: "GET",
       url: "/rider/read/orders/:id",
       handler: riderController.getRiderOrders,
       preHandler: async (request, reply) => {
-        await fastify.verifyToken(request, reply);
+        await fastify.verifyRiderToken(request, reply);
       },
     };
   };
@@ -183,12 +206,14 @@ module.exports = function riderSchema(opts) {
     readByID,
     readIndividualRidersOrders,
     readRiderStats,
+    readReviews,
     add,
     addRiderReview,
     addRiderBill,
     update,
     updateRiderStatus,
     deleteByID,
+    deleteReviewByID,
     getRiderOrders,
   };
 };

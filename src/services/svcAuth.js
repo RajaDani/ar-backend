@@ -11,6 +11,7 @@ module.exports = function svcAuth(opts) {
     mdlCustomerAddress,
     mdlRider,
     mdlBusiness,
+    Op
   } = opts;
   const { User } = mdlUser;
   const { Rider } = mdlRider;
@@ -29,10 +30,8 @@ module.exports = function svcAuth(opts) {
       lng,
       city_id,
     } = params;
-    const emailCheck = await User.count({ where: { email } });
-    if (emailCheck > 0) throw Boom.conflict("Email already exists!");
-    const contactCheck = await User.count({ where: { contact } });
-    if (contactCheck > 0) throw Boom.conflict("Contact already exists!");
+    const emailCheck = await User.count({ where: { [Op.or]: [{ email }, { contact }] } });
+    if (emailCheck > 0) throw Boom.conflict("Email or contact already exists!");
     const pass = encryption.hashPassword(password, config);
     const token = await encryption.generateToken(params);
     let userData = {};
@@ -128,15 +127,9 @@ module.exports = function svcAuth(opts) {
         email: email,
         password: pass,
       },
-      // include: [
-      //   {
-      //     model: CustomerAddress,
-      //     attributes: ["address_details"],
-      //   },
-      // ],
     });
     if (!rider) throw Boom.conflict("Incorrect email or password");
-    const token = await encryption.generateToken(rider);
+    const token = await encryption.generateRiderToken(rider);
     if (token)
       return {
         msg: "success",
@@ -160,7 +153,7 @@ module.exports = function svcAuth(opts) {
       },
     });
     if (!business) throw Boom.conflict("Incorrect email or password");
-    const token = await encryption.generateToken(business);
+    const token = await encryption.generateBusinessToken(business);
     if (token)
       return {
         msg: "success",
@@ -169,6 +162,7 @@ module.exports = function svcAuth(opts) {
         name: business.name,
         email: business.email,
         contact: business.contact,
+        role: "business"
         // address: Rider.customer_addresses[0].address_details,
       };
   }
@@ -193,6 +187,7 @@ module.exports = function svcAuth(opts) {
         modules: admin.modules,
         contact: admin.contact,
         admin_type: admin.admin_type,
+        role: "admin"
       };
       return { msg: "success", data };
     }

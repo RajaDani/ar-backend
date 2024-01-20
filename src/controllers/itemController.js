@@ -6,6 +6,11 @@ module.exports = function itemController(opts) {
     reply.send({ code: 200, reply: records });
   }
 
+  async function getHiddenItems(request, reply) {
+    const records = await svcItem.getHiddenItems(request.params);
+    reply.send({ code: 200, reply: records });
+  }
+
   async function getItemsFeatured(request, reply) {
     const records = await svcItem.getItemsFeatured(request.params);
     reply.send({ code: 200, reply: records });
@@ -22,7 +27,9 @@ module.exports = function itemController(opts) {
   }
 
   async function getItemsBySubcategoryAndBusiness(request, reply) {
-    const records = await svcItem.getItemsBySubcategoryAndBusiness(request.params);
+    const records = await svcItem.getItemsBySubcategoryAndBusiness(
+      request.params
+    );
     reply.send({ code: 200, reply: records });
   }
 
@@ -61,6 +68,11 @@ module.exports = function itemController(opts) {
     const record = await svcItem.updateItem(params, body);
     reply.send({ code: 200, reply: record });
   }
+  async function updateItemDiscount(request, reply) {
+    const { body } = request;
+    const record = await svcItem.updateItemDiscount(body);
+    reply.send({ code: 200, reply: record });
+  }
 
   async function deleteItemByID(request, reply) {
     const record = await svcItem.deleteItemByID(request.params);
@@ -69,6 +81,7 @@ module.exports = function itemController(opts) {
 
   return {
     getItems,
+    getHiddenItems,
     getItemsFeatured,
     getItemsBySubcategory,
     getItemsByBusiness,
@@ -80,6 +93,7 @@ module.exports = function itemController(opts) {
     bulkAddItem,
     addItem,
     updateItem,
-    deleteItemByID
+    deleteItemByID,
+    updateItemDiscount,
   };
 };

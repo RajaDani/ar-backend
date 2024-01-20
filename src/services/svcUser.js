@@ -1,7 +1,18 @@
 module.exports = function svcUser(opts) {
-  const { sequelizeCon, sequelize, mdlUser, mdlOrder, mdlItem,
-    mdlAppointment, mdlCustomerAddress, encryption, config, mdlCity, Boom } =
-    opts;
+  const {
+    sequelizeCon,
+    sequelize,
+    mdlUser,
+    mdlOrder,
+    mdlItem,
+    mdlAppointment,
+    mdlCustomerAddress,
+    encryption,
+    config,
+    mdlCity,
+    Boom,
+    Op
+  } = opts;
   const { User } = mdlUser;
   const { Order } = mdlOrder;
   const { CustomerAddress } = mdlCustomerAddress;
@@ -11,14 +22,25 @@ module.exports = function svcUser(opts) {
 
   async function getCustomers(params) {
     const users = await User.findAll({
-      attributes: ["id", "name", "email", "contact", "status"],
+      attributes: [
+        "id",
+        "name",
+        "email",
+        "contact",
+        "status",
+        "bachat_card_holder",
+        "student_card_holder",
+        "card_expiry",
+      ],
       where: {
         status: 1,
       },
-      include: [{
-        model: City,
-        attributes: ["id", "name"]
-      }]
+      include: [
+        {
+          model: City,
+          attributes: ["id", "name"],
+        },
+      ],
     });
     return users;
   }
@@ -27,11 +49,13 @@ module.exports = function svcUser(opts) {
     const { customerId } = params;
     const address = await CustomerAddress.findAll({
       attributes: ["id", "address_details"],
-      include: [{
-        model: User,
-        where: { id: customerId },
-        attributes: []
-      }],
+      include: [
+        {
+          model: User,
+          where: { id: customerId },
+          attributes: [],
+        },
+      ],
       where: {
         status: 1,
       },
@@ -41,29 +65,39 @@ module.exports = function svcUser(opts) {
 
   async function getCustomerByID(params) {
     const user = await User.findOne({
-      attributes: ["id", "name", "email", "contact"],
+      attributes: [
+        "id",
+        "name",
+        "email",
+        "contact",
+        "bachat_card_holder",
+        "student_card_holder",
+        "card_expiry",
+      ],
       where: {
         id: params.id,
       },
-      include: [{
-        model: CustomerAddress,
-        attributes: ["address_details", "lat", "lng"],
-        limit: 1
-      },
-      {
-        model: City,
-        attributes: ["name"]
-      }
+      include: [
+        {
+          model: CustomerAddress,
+          attributes: ["address_details", "lat", "lng"],
+          limit: 1,
+        },
+        {
+          model: City,
+          attributes: ["name"],
+        },
       ],
     });
 
     const stringifyData = JSON.stringify(user);
     const filteredData = JSON.parse(stringifyData);
 
-    filteredData["address_details"] = filteredData.customer_addresses[0]?.address_details;
+    filteredData["address_details"] =
+      filteredData.customer_addresses[0]?.address_details;
     filteredData["lat"] = filteredData.customer_addresses[0]?.lat;
     filteredData["lng"] = filteredData.customer_addresses[0]?.lng;
-    delete filteredData["customer_addresses"]
+    delete filteredData["customer_addresses"];
 
     return filteredData;
   }
@@ -71,7 +105,8 @@ module.exports = function svcUser(opts) {
   async function getUserOrders(params) {
     const { id } = params;
 
-    const sql = `SELECT o.id,o.total,o.createdAt,o.progress_status,
+    const sql = `SELECT o.id,o.total,o.createdAt,o.progress_status,r.name AS rider_name,
+          r.id AS rider_id,
         GROUP_CONCAT(oi.item_id) AS item_ids,GROUP_CONCAT(it.name) AS item_names,
         GROUP_CONCAT(b.name) AS business_names 
         FROM orders AS o 
@@ -80,7 +115,7 @@ module.exports = function svcUser(opts) {
         LEFT JOIN businesses AS b ON b.id = it.business_id 
         LEFT JOIN customers AS u ON u.id = o.customer_id 
         LEFT JOIN riders AS r ON r.id = o.rider_id 
-        WHERE o.status = 1 AND o.customer_id =${id} GROUP BY o.id`
+        WHERE o.status = 1 AND o.customer_id =${id} GROUP BY o.id`;
 
     const orders = await sequelizeCon.query(sql, {
       type: sequelize.QueryTypes.SELECT,
@@ -90,10 +125,12 @@ module.exports = function svcUser(opts) {
     let past_orders = [];
 
     for (let order of orders) {
-      if (order.progress_status == "cancelled" || order.progress_status == "completed") {
+      if (
+        order.progress_status == "cancelled" ||
+        order.progress_status == "completed"
+      ) {
         past_orders.push(order);
-      }
-      else current_orders.push(order);
+      } else current_orders.push(order);
     }
 
     return { current_orders, past_orders };
@@ -103,47 +140,58 @@ module.exports = function svcUser(opts) {
     const { id } = params;
 
     const appointments = Appointment.findAll({
-      attributes: ["id", "appointment_fee", "patient_name", "platform_fee", "appointment_date", "appointment_time", "appointment_progress"],
-      include: [{
-        model: Item,
-        attributes: ["name"]
-      }],
-      where: { customer_id: id }
-    })
+      attributes: [
+        "id",
+        "appointment_fee",
+        "app_holder_name",
+        "platform_fee",
+        "appointment_date",
+        "appointment_time",
+        "appointment_progress",
+      ],
+      include: [
+        {
+          model: Item,
+          attributes: ["name"],
+        },
+      ],
+      where: { customer_id: id },
+    });
 
     return appointments;
   }
 
   async function addCustomer(params) {
     // sequelizeCon.sync({ force: true });
-    const { name, email, password, contact, address_details, lat, lng } =
-      params;
-    const count = await User.count({ where: { email: email } });
-    if (count > 0) return { code: 200, msg: "Email already exists!" };
+    const { email, password, address_details, lat, lng } = params;
+    delete params["address_details"];
+    delete params["lat"];
+    delete params["lng"];
+    const count = await User.count({ where: { [Op.or]: [{ email }, { contact }] } });
+    if (count > 0) return { code: 200, msg: "Email or contact already exists!" };
     const pass = await encryption.hashPassword(password, config);
+    params["password"] = pass;
 
-    const user = await User.create({
-      name: name,
-      email,
-      password: pass,
-      contact,
-    });
+    const user = await User.create(params);
 
-    if (user) await CustomerAddress.create({
-      address_details, lat, lng, customerId: user.id
-    })
+    if (user)
+      await CustomerAddress.create({
+        address_details,
+        lat,
+        lng,
+        customerId: user.id,
+      });
 
     return user.id;
   }
 
   async function addCustomerAddress(body) {
-    const address = await CustomerAddress.create(body)
-    return address
+    const address = await CustomerAddress.create(body);
+    return address;
   }
 
   async function quickAddCustomer(params) {
-    const { name, contact, address_details, city_id } =
-      params;
+    const { name, contact, address_details, city_id } = params;
     const count = await User.count({ where: { contact: contact } });
     if (count > 0) return { code: 200, msg: "User already exists!" };
 
@@ -154,24 +202,40 @@ module.exports = function svcUser(opts) {
       name: name,
       password: pass,
       contact,
-      city_id
+      city_id,
     });
 
-    if (user) await CustomerAddress.create({
-      address_details, customerId: user.id
-    })
+    if (user)
+      await CustomerAddress.create({
+        address_details,
+        customerId: user.id,
+      });
     return user.id;
   }
 
   async function updateCustomer(params, data) {
-    const { name, email, contact, address_details, lat, lng, city_id } = data;
+    const {
+      name,
+      email,
+      contact,
+      address_details,
+      lat,
+      lng,
+      city_id,
+      bachat_card_holder,
+      student_card_holder,
+      card_expiry,
+    } = data;
     const user = await User.update(
       {
         name: name,
         contact,
         email,
         city_id,
+        bachat_card_holder,
+        student_card_holder,
         status: 1,
+        card_expiry,
       },
       {
         where: {
@@ -180,8 +244,11 @@ module.exports = function svcUser(opts) {
       }
     );
 
-    if (user) await CustomerAddress.update({ address_details, lat, lng },
-      { where: { customerId: params.id } });
+    if (user)
+      await CustomerAddress.update(
+        { address_details, lat, lng },
+        { where: { customerId: params.id } }
+      );
 
     return user;
   }
@@ -194,17 +261,14 @@ module.exports = function svcUser(opts) {
     const userPass = await User.findOne({
       where: {
         password: curr_pass,
-        id
-      }
-    })
+        id,
+      },
+    });
 
     if (!userPass) throw Boom.conflict("Current password is incorrect!");
     const pass = encryption.hashPassword(new_password, config);
-    const user = await User.update(
-      { password: pass },
-      { where: { id } }
-    )
-    return { code: 200, reply: user }
+    const user = await User.update({ password: pass }, { where: { id } });
+    return { code: 200, reply: user };
   }
 
   async function deleteCustomerByID(params) {

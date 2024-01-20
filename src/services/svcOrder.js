@@ -16,6 +16,7 @@ module.exports = function svcOrder(opts) {
     config,
     mdlAdmin,
     nodemailer,
+    axios
   } = opts;
   const { Order } = mdlOrder;
   const { Business } = mdlBusiness;
@@ -53,10 +54,10 @@ module.exports = function svcOrder(opts) {
     const count = await Order.count({
       where: { status: 1 },
     });
-    const sql = `SELECT o.id,o.total,o.createdAt,CASE WHEN o.posted_by = 1 THEN 'Client'
+    const sql = `SELECT o.id,o.total,o.createdAt,o.order_processing_time,CASE WHEN o.posted_by = 1 THEN 'Client'
       WHEN o.posted_by = 2 THEN 'Admin' ELSE o.posted_by END AS posted_by,o.progress_status,o.address,o.delivery_time,
       c.name AS city_name,GROUP_CONCAT(oi.item_id) AS item_ids,GROUP_CONCAT(oi.order_item_profit) AS profits,
-      GROUP_CONCAT(it.name) AS item_names,SUM(oi.order_item_profit) AS total_profit,
+      GROUP_CONCAT(oi.order_item_name) AS item_names,SUM(oi.order_item_profit) AS total_profit,
       GROUP_CONCAT(b.name) AS business_names,r.name AS rider_name 
       FROM orders AS o 
       LEFT JOIN order_items AS oi ON oi.order_id = o.id 
@@ -66,7 +67,7 @@ module.exports = function svcOrder(opts) {
       LEFT JOIN riders AS r ON r.id = o.rider_id 
       LEFT JOIN cities AS c ON c.id = o.city_id 
       WHERE o.status = 1 GROUP BY o.id,o.progress_status 
-      ORDER BY CASE WHEN progress_status = 'pending' THEN 0 ELSE 1 END LIMIT :offset, :limit`;
+      ORDER BY CASE WHEN progress_status = 'pending' THEN 0 ELSE 1 END,id DESC LIMIT :offset, :limit`;
 
     const orders = await sequelizeCon.query(sql, {
       replacements: {
@@ -96,6 +97,7 @@ module.exports = function svcOrder(opts) {
         "order_bill_image",
         "rider_id",
         "total",
+        "hold_order_till",
       ],
       where: { id: params.id },
       include: [
@@ -119,6 +121,9 @@ module.exports = function svcOrder(opts) {
             "item_id",
             "business_id",
             "order_item_profit",
+            "item_picked",
+            "picked_at",
+            "updatedAt",
           ],
           where: { order_id: params.id },
           include: [
@@ -151,6 +156,8 @@ module.exports = function svcOrder(opts) {
           image_url: x.item?.image_url,
           business_id: x?.business_id,
           profit: x?.order_item_profit,
+          item_picked: x?.item_picked,
+          picked_at: x?.picked_at,
         };
       });
       delete orderData["order_items"];
@@ -166,52 +173,48 @@ module.exports = function svcOrder(opts) {
       ],
       where: { business_id: id },
     });
-    // Extract order_ids from the result and return them as an array
     const Ids = orderIds.map((orderItem) => orderItem.order_id);
-    if (Ids.length) {
-      // const orders = await Order.findAll({
-      //   where: {
-      //     id: {
-      //       [sequelize.Op.in]: Ids,
-      //     },
-      //   },
-      // });
 
-      // return orders;
-      const sql = `SELECT o.id, o.total, o.createdAt,
-      CASE 
-      WHEN o.posted_by = 1 THEN 'Client'
-      WHEN o.posted_by = 2 THEN 'Admin' 
-      ELSE o.posted_by 
-      END AS posted_by,
-      o.progress_status, o.address,
-      c.name AS city_name,
-      GROUP_CONCAT(oi.item_id) AS item_ids,
-      GROUP_CONCAT(it.name) AS item_names,
-      GROUP_CONCAT(b.name) AS business_names,
-      r.name AS rider_name 
-      FROM 
-      orders AS o 
-      LEFT JOIN order_items AS oi ON oi.order_id = o.id 
-      LEFT JOIN items AS it ON it.id = oi.item_id 
-      LEFT JOIN businesses AS b ON b.id = it.business_id 
-      LEFT JOIN customers AS u ON u.id = o.customer_id 
-      LEFT JOIN riders AS r ON r.id = o.rider_id 
-      LEFT JOIN cities AS c ON c.id = o.city_id 
-      WHERE 
-      o.status = 1 
-      AND o.id IN (${Ids.join(
-        ", "
-      )}) -- Use IN clause for filtering by order IDs
-  GROUP BY 
-    o.id`;
+    if (Ids.length) {
+      const sql = `
+        SELECT 
+          o.id, o.createdAt,
+          CASE 
+            WHEN o.posted_by = 1 THEN 'Client'
+            WHEN o.posted_by = 2 THEN 'Admin' 
+            ELSE o.posted_by 
+          END AS posted_by,
+          o.progress_status, o.address,
+          c.name AS city_name,
+          SUM(oi.order_item_price * oi.order_item_quantity) as total,
+          GROUP_CONCAT(oi.item_id) AS item_ids,
+          GROUP_CONCAT(it.name) AS item_names,
+          GROUP_CONCAT(oi.order_item_price) AS item_prices,
+          GROUP_CONCAT(oi.order_item_quantity) AS item_quantity,
+          GROUP_CONCAT(b.name) AS business_names,
+          r.name AS rider_name 
+        FROM 
+          orders AS o 
+          LEFT JOIN order_items AS oi ON oi.order_id = o.id AND oi.business_id = :businessId 
+          LEFT JOIN items AS it ON it.id = oi.item_id AND it.business_id = :businessId
+          LEFT JOIN businesses AS b ON b.id = it.business_id 
+          LEFT JOIN customers AS u ON u.id = o.customer_id 
+          LEFT JOIN riders AS r ON r.id = o.rider_id 
+          LEFT JOIN cities AS c ON c.id = o.city_id 
+        WHERE 
+          o.status = 1 
+          AND o.id IN (:orderIds)
+        GROUP BY 
+          o.id`;
 
       const orders = await sequelizeCon.query(sql, {
         type: sequelize.QueryTypes.SELECT,
+        replacements: { businessId: id, orderIds: Ids },
       });
 
       return orders;
     }
+
     return Ids;
   }
 
@@ -295,6 +298,7 @@ module.exports = function svcOrder(opts) {
           if (parseData[x].name == custom_item[y].name) {
             parseData[x].quantity = custom_item[y].quantity;
             parseData[x].profit = custom_item[y].profit;
+            parseData[x].item_picked = custom_item[y].item_picked;
           }
       }
 
@@ -306,6 +310,7 @@ module.exports = function svcOrder(opts) {
           new_price: x.price,
           business_id: x?.business_id ?? null,
           profit: x?.profit,
+          item_picked: x?.item_picked,
         })
       );
     }
@@ -319,8 +324,12 @@ module.exports = function svcOrder(opts) {
       attributes: ["email"],
       where: { status: 1 },
     });
+
     const emailsList = email.map((x) => x.email);
     sendEmail(emailsList, params);
+
+    // if()
+    // await axios.post(`https://secure.h3techs.com/sms/api/send?email=abdurrehman825@gmail.com&key=02760a2ab2a613810cc4e3150d576f2620&mask=AR Services&to=923400576761&message=This is a Test Message`)
     return order.id;
   }
 
@@ -352,6 +361,8 @@ module.exports = function svcOrder(opts) {
           if (parseData[x].name == custom_item[y].name) {
             parseData[x].quantity = custom_item[y].quantity;
             parseData[x].profit = custom_item[y].profit;
+            parseData[x].item_picked = custom_item[y].item_picked;
+            parseData[x].picked_at = custom_item[y].picked_at;
           }
       }
       parseData.map((x) =>
@@ -362,6 +373,7 @@ module.exports = function svcOrder(opts) {
           new_price: x.price,
           business_id: x?.business_id ?? null,
           profit: x?.profit,
+          item_picked: x?.item_picked,
         })
       );
     }
@@ -371,8 +383,11 @@ module.exports = function svcOrder(opts) {
       await OrderItem.bulkCreate(itemData, {
         updateOnDuplicate: [
           "order_item_quantity",
+          "order_item_profit",
           "order_item_price",
           "order_item_name",
+          "item_picked",
+          "picked_at",
           "createdAt",
           "updatedAt",
         ],
@@ -418,6 +433,8 @@ module.exports = function svcOrder(opts) {
       order_item_quantity: x.quantity,
       business_id: x.business_id,
       order_item_profit: x?.profit,
+      item_picked: x?.item_picked,
+      picked_at: x?.picked_at ?? "",
     }));
   }
 

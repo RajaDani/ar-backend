@@ -36,7 +36,7 @@ module.exports = function svcArea(opts) {
     async function getAreaByID(params) {
         const area = await Area.findOne({
             attributes: ["id", "name", "delivery_charges", "location_side_id", "km_from_city"
-                , "charges_per_km", "road_issue", "city_id"],
+                , "charges_per_km", "road_issue", "city_id", "in_city"],
             where: {
                 id: params.id,
             },
@@ -49,7 +49,6 @@ module.exports = function svcArea(opts) {
                 attributes: ["name"]
             }
             ],
-
         });
         return area
     }
@@ -71,6 +70,8 @@ module.exports = function svcArea(opts) {
     }
 
     async function addLocationSide(params) {
+        const count = await LocationSide.count({ where: { name: params.name } });
+        if (count > 0) return { code: 200, msg: "Location Side already exists!" };
         const area = await LocationSide.create(params);
         return area.id;
     }

@@ -17,6 +17,8 @@ module.exports = function svcItem(opts) {
         "item_type",
         "rating",
         "featured",
+        "created_by",
+        "updated_by",
       ],
       where: {
         status: 1,
@@ -40,13 +42,62 @@ module.exports = function svcItem(opts) {
       delete x["subcategory"];
       x["business"] = business?.name;
       x["subcategory"] = subcategory?.name;
+      return x;
+    });
+    return updatedData;
+  }
 
+  async function getHiddenItems(params) {
+    const items = await Item.findAll({
+      attributes: [
+        "id",
+        "name",
+        "image_url",
+        "price",
+        "old_price",
+        "variation_data",
+        "item_type",
+        "rating",
+        "featured",
+        "created_by",
+        "updated_by",
+      ],
+      where: [
+        {
+          status: 0,
+          subcategory_id: { [Op.ne]: null },
+        },
+      ],
+      include: [
+        {
+          model: Business,
+          attributes: ["name"],
+        },
+        {
+          model: Subcategory,
+          attributes: ["name"],
+        },
+      ],
+    });
+
+    let stringify = JSON.stringify(items);
+    let itemData = JSON.parse(stringify);
+    const updatedData = itemData.map((x) => {
+      const { business, subcategory } = x;
+      delete x["business"];
+      delete x["subcategory"];
+      x["business"] = business?.name;
+      x["subcategory"] = subcategory?.name;
       return x;
     });
     return updatedData;
   }
 
   async function getItemsFeatured(params) {
+    let whereQuery = {};
+    if (params.categoryId) whereQuery = { category_id: params.categoryId };
+    else whereQuery = { status: 1 };
+
     const items = await Item.findAll({
       attributes: [
         "id",
@@ -58,6 +109,8 @@ module.exports = function svcItem(opts) {
         "old_price",
         "rating",
         "featured",
+        "bachat_card_discount",
+        "student_card_discount",
       ],
       where: {
         status: 1,
@@ -66,11 +119,18 @@ module.exports = function svcItem(opts) {
       include: [
         {
           model: Business,
-          attributes: ["id", "name"],
+          attributes: [
+            "id",
+            "name",
+            "location_side_id",
+            "in_city",
+            "delivery_charges",
+          ],
         },
         {
           model: Subcategory,
           attributes: ["name"],
+          where: whereQuery,
         },
       ],
     });
@@ -146,6 +206,7 @@ module.exports = function svcItem(opts) {
     });
 
     let updatedData = item;
+
     let variation_data = updatedData.variation_data;
     if (variation_data) {
       let data = JSON.parse(variation_data);
@@ -169,6 +230,8 @@ module.exports = function svcItem(opts) {
         "item_type",
         "rating",
         "featured",
+        "student_card_discount",
+        "bachat_card_discount",
       ],
       where: {
         business_id: businessId,
@@ -224,6 +287,9 @@ module.exports = function svcItem(opts) {
             "image_url",
             "start_time",
             "end_time",
+            "in_city",
+            "location_side_id",
+            "delivery_charges",
           ],
         },
         {
@@ -245,19 +311,53 @@ module.exports = function svcItem(opts) {
     const { name, businessId } = params;
     if (!name) return [];
     const item = await Item.findAll({
-      attributes: ["id", "name", "price", "description", "rating"],
+      attributes: [
+        "id",
+        "name",
+        "price",
+        "image_url",
+        "description",
+        "old_price",
+        "variation_data",
+        "item_type",
+        "rating",
+        "featured",
+        "student_card_discount",
+        "bachat_card_discount",
+      ],
       where: {
         name: {
           [Op.like]: `%${name}%`,
         },
         business_id: businessId,
       },
+      include: [
+        {
+          model: Subcategory,
+          attributes: ["id", "name", "image_url"],
+        },
+        {
+          model: Business,
+          attributes: [
+            "id",
+            "name",
+            "in_city",
+            "location_side_id",
+            "delivery_charges",
+          ],
+        },
+      ],
     });
     return item;
   }
 
   async function bulkAddItem(params) {
     const { data } = params;
+    for (let x in data) {
+      if (data[x]["variation_data"] != "null") {
+        data[x]["variation_data"] = JSON.parse(data[x]["variation_data"]);
+      }
+    }
     const item = await Item.bulkCreate(data);
     return item;
   }
@@ -288,6 +388,19 @@ module.exports = function svcItem(opts) {
 
     return { code: 200, msg: item };
   }
+  async function updateItemDiscount(data) {
+    const { card, itemsIds, percentage, businessId } = data;
+    const item = await Item.update(
+      { [card]: percentage },
+      { where: { id: { [Op.in]: itemsIds } } }
+    );
+    await Business.update(
+      { discount_alloted: true },
+      { where: { id: businessId } }
+    );
+
+    return item;
+  }
 
   async function deleteItemByID(params) {
     const item = await Item.update(
@@ -305,6 +418,7 @@ module.exports = function svcItem(opts) {
 
   return {
     getItems,
+    getHiddenItems,
     getItemByID,
     getItemsByBusiness,
     getItemsBySubcategory,
@@ -317,5 +431,6 @@ module.exports = function svcItem(opts) {
     addItem,
     updateItem,
     deleteItemByID,
+    updateItemDiscount,
   };
 };

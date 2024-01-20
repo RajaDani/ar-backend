@@ -1,7 +1,8 @@
 const { Sequelize } = require("sequelize");
 
 module.exports = function mdlUser(opts) {
-  const { sequelize, sequelizeCon, mdlSubcategory, mdlBusiness, mdlAdmin } = opts;
+  const { sequelize, sequelizeCon, mdlSubcategory, mdlBusiness, mdlAdmin } =
+    opts;
   const { Subcategory } = mdlSubcategory;
   const { Business } = mdlBusiness;
   const { Admin } = mdlAdmin;
@@ -69,6 +70,22 @@ module.exports = function mdlUser(opts) {
       type: sequelize.JSON,
       allowNull: true,
     },
+    bachat_card_discount: {
+      type: sequelize.INTEGER,
+      allowNull: true,
+    },
+    student_card_discount: {
+      type: sequelize.INTEGER,
+      allowNull: true,
+    },
+    created_by: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
+    updated_by: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
     status: {
       type: sequelize.BOOLEAN,
       defaultValue: true,
@@ -77,8 +94,6 @@ module.exports = function mdlUser(opts) {
 
   Item.belongsTo(Subcategory, { foreignKey: "subcategory_id" });
   Item.belongsTo(Business, { foreignKey: "business_id" });
-  Item.belongsTo(Admin, { foreignKey: "admin_id" });
-
 
   return {
     Item,

@@ -26,6 +26,18 @@ module.exports = function mdlUser(opts) {
       type: sequelize.BIGINT,
       allowNull: true,
     },
+    bachat_card_holder: {
+      type: sequelize.BOOLEAN,
+      defaultValue: false,
+    },
+    student_card_holder: {
+      type: sequelize.BOOLEAN,
+      defaultValue: false,
+    },
+    card_expiry: {
+      type: sequelize.BIGINT,
+      allowNull: true,
+    },
     status: {
       type: sequelize.BOOLEAN,
       defaultValue: true,

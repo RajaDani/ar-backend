@@ -9,10 +9,18 @@ module.exports = function itemSchema(opts) {
     };
   };
 
+  const readHiddenItems = ({ fastify }) => {
+    return {
+      method: "GET",
+      url: "/item/read/hidden",
+      handler: itemController.getHiddenItems,
+    };
+  };
+
   const readFeaturedItems = ({ fastify }) => {
     return {
       method: "GET",
-      url: "/item/read/featured",
+      url: "/item/read/featured/:categoryId",
       handler: itemController.getItemsFeatured,
     };
   };
@@ -80,7 +88,7 @@ module.exports = function itemSchema(opts) {
       schema: {
         body: Joi.object().keys({
           data: Joi.array().required(),
-        })
+        }),
       },
       preHandler: async (request, reply) => {
         await fastify.verifyAdminToken(request, reply);
@@ -109,9 +117,13 @@ module.exports = function itemSchema(opts) {
           service_end_time: Joi.string().allow(null, ""),
           service_online_start_time: Joi.string().allow(null, ""),
           service_online_end_time: Joi.string().allow(null, ""),
-          admin_id: Joi.number().required(),
           business_id: Joi.number().required(),
           subcategory_id: Joi.number().required(),
+          created_by: Joi.string().optional().allow("", null),
+          updated_by: Joi.string().optional().allow("", null),
+          student_card_discount: Joi.number().optional().allow(null, ""),
+          bachat_card_discount: Joi.number().optional().allow(null, ""),
+          status: Joi.boolean(),
         }),
       },
       preHandler: async (request, reply) => {
@@ -141,9 +153,13 @@ module.exports = function itemSchema(opts) {
           service_end_time: Joi.string().optional().allow(null, ""),
           service_online_start_time: Joi.string().optional().allow(null, ""),
           service_online_end_time: Joi.string().optional().allow(null, ""),
-          admin_id: Joi.number().optional(),
           business_id: Joi.number().optional(),
           subcategory_id: Joi.number().optional(),
+          created_by: Joi.string().optional().allow("", null),
+          updated_by: Joi.string().optional().allow("", null),
+          student_card_discount: Joi.number().optional().allow(null, ""),
+          bachat_card_discount: Joi.number().optional().allow(null, ""),
+          status: Joi.boolean(),
         }),
       },
       preHandler: async (request, reply) => {
@@ -152,7 +168,24 @@ module.exports = function itemSchema(opts) {
       handler: itemController.updateItem,
     };
   };
-
+  const updateItemDiscount = ({ fastify }) => {
+    return {
+      method: "PUT",
+      url: "/item/discount/update",
+      schema: {
+        body: Joi.object().keys({
+          card: Joi.string().required(),
+          itemsIds: Joi.array().required(),
+          percentage: Joi.number().required(),
+          businessId: Joi.number().required(),
+        }),
+      },
+      preHandler: async (request, reply) => {
+        await fastify.verifyAdminToken(request, reply);
+      },
+      handler: itemController.updateItemDiscount,
+    };
+  };
   const deleteByID = ({ fastify }) => {
     return {
       method: "DELETE",
@@ -166,6 +199,7 @@ module.exports = function itemSchema(opts) {
 
   return {
     read,
+    readHiddenItems,
     readFeaturedItems,
     searchItem,
     readByBusiness,
@@ -177,6 +211,7 @@ module.exports = function itemSchema(opts) {
     bulkAdd,
     add,
     update,
-    deleteByID
+    deleteByID,
+    updateItemDiscount,
   };
 };
