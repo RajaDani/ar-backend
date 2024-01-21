@@ -141,7 +141,7 @@ module.exports = function riderSchema(opts) {
         }),
       },
       preHandler: async (request, reply) => {
-        await fastify.verifyToken(request, reply);
+        await fastify.verifyAdminToken(request, reply);
       },
       handler: riderController.updateRider,
     };

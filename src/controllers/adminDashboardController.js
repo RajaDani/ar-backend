@@ -21,8 +21,18 @@ module.exports = function areaController(opts) {
         reply.send({ code: 200, reply: record });
     }
 
+    async function getMemberships(request, reply) {
+        const record = await svcAdminDashboard.getMemberships();
+        reply.send({ code: 200, reply: record });
+    }
+
+    async function updateMembership(request, reply) {
+        const record = await svcAdminDashboard.updateMembership(request.params, request.body);
+        reply.send({ code: 200, reply: record });
+    }
+
     return {
         getDashboardAnalytics, getOrdersByCity, getOrdersByWeek,
-        getLatestTransactions,
+        getLatestTransactions, getMemberships, updateMembership
     };
 };

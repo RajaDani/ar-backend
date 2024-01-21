@@ -1,6 +1,5 @@
 module.exports = function mdlUser(opts) {
-  const { sequelize, sequelizeCon, mdlRider } = opts;
-  const { Rider } = mdlRider;
+  const { sequelize, sequelizeCon } = opts;
 
   const Admin = sequelizeCon.define("admin", {
     id: {
@@ -42,8 +41,6 @@ module.exports = function mdlUser(opts) {
       allowNull: false,
     },
   });
-
-  Admin.hasOne(Rider, { foreignKey: 'id_admin', foreignKeyConstraint: true });
 
   return {
     Admin,

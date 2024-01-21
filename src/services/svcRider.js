@@ -81,6 +81,9 @@ module.exports = function svcRider(opts) {
 
   async function addRider(params) {
     const { image_url, password } = params;
+    const { id } = identity;
+    params["admin_id"] = id;
+
     delete params["image_url"];
     delete params["password"];
     const pass = await encryption.hashPassword(password, config);

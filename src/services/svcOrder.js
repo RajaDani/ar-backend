@@ -33,14 +33,14 @@ module.exports = function svcOrder(opts) {
     const smtp = config.get("smtpConfig");
     const transporter = nodemailer.createTransport(smtp);
     const emails = email.toString();
-    const { total } = orderData;
+    const { total, city } = orderData;
 
     try {
       await transporter.sendMail({
         from: '"AR Home Services" <arhomeservices@gmail.com>',
         to: `${emails}`,
         subject: `Order Placed`,
-        html: `<p>A new order placed of total ${total} pkr has been placed!</p>`,
+        html: `<p>A new order of total Pkr.${total} has been placed in ${city} city!</p>`,
       });
     } catch (err) {
       console.log(err);
@@ -324,7 +324,12 @@ module.exports = function svcOrder(opts) {
       attributes: ["email"],
       where: { status: 1 },
     });
-
+    const city = await City.findOne({ attributes: ["name"], where: { id: params.city_id }, raw: true });
+    console.log('====================================');
+    console.log("====== city =====,", city);
+    console.log("====== params =====,", params);
+    console.log('====================================');
+    params["city"] = city?.name
     const emailsList = email.map((x) => x.email);
     sendEmail(emailsList, params);
 

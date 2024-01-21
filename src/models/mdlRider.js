@@ -1,6 +1,7 @@
 module.exports = function mdlRider(opts) {
-  const { sequelize, sequelizeCon, mdlCity } = opts;
+  const { sequelize, sequelizeCon, mdlAdmin, mdlCity } = opts;
 
+  const { Admin } = mdlAdmin;
   const { City } = mdlCity;
 
   const Rider = sequelizeCon.define("rider", {
@@ -68,6 +69,7 @@ module.exports = function mdlRider(opts) {
     },
   });
 
+  Rider.belongsTo(Admin, { foreignKey: "admin_id" });
   Rider.belongsTo(City, { foreignKey: "city_id" });
 
   return { Rider };

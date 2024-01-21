@@ -27,7 +27,8 @@ module.exports = function riderController(opts) {
   }
 
   async function addRider(request, reply) {
-    const record = await svcRider.addRider(request.body);
+    const { body, identity } = request;
+    const record = await svcRider.addRider(body, identity);
     reply.send({ code: 200, reply: record });
   }
 

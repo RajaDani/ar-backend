@@ -73,6 +73,7 @@ module.exports = function svcUser(opts) {
         "bachat_card_holder",
         "student_card_holder",
         "card_expiry",
+        "city_id"
       ],
       where: {
         id: params.id,

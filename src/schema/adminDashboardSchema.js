@@ -45,11 +45,38 @@ module.exports = function adminDashboardSchema(opts) {
         };
     };
 
+    const getMemberships = ({ fastify }) => {
+        return {
+            method: "GET",
+            url: "/admin/read/memberships",
+            handler: adminDashboardController.getMemberships,
+        };
+    };
+
+    const updateMembership = ({ fastify }) => {
+        return {
+            method: "POST",
+            url: "/admin/update/membership/:id",
+            schema: {
+                body: Joi.object().keys({
+                    description: Joi.string().required(),
+                    image: Joi.string().allow(null, ""),
+                }),
+            },
+            preHandler: async (request, reply) => {
+                await fastify.verifyAdminToken(request, reply);
+            },
+            handler: adminDashboardController.updateMembership,
+        };
+    };
+
     return {
         readAnaltics,
         readOrdersByCity,
         getOrdersByWeek,
-        getLatestTransactions
+        getLatestTransactions,
+        getMemberships,
+        updateMembership
     };
 };
 

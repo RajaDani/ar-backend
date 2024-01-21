@@ -143,18 +143,32 @@ module.exports = function svcItem(opts) {
       attributes: [
         "id",
         "name",
+        "item_type",
+        "variation_data",
         "image_url",
         "price",
         "old_price",
-        "item_type",
-        "variation_data",
         "rating",
         "featured",
+        "bachat_card_discount",
+        "student_card_discount",
       ],
       where: {
         status: 1,
         subcategory_id: subCategoryId,
       },
+      include: [
+        {
+          model: Business,
+          attributes: [
+            "id",
+            "name",
+            "location_side_id",
+            "in_city",
+            "delivery_charges",
+          ],
+        },
+      ],
     });
     return items;
   }
@@ -165,19 +179,33 @@ module.exports = function svcItem(opts) {
       attributes: [
         "id",
         "name",
+        "item_type",
+        "variation_data",
         "image_url",
         "price",
         "old_price",
         "rating",
         "featured",
-        "item_type",
-        "variation_data",
+        "bachat_card_discount",
+        "student_card_discount",
       ],
       where: {
         status: 1,
         subcategory_id: subCategoryId,
         business_id: businessId,
       },
+      include: [
+        {
+          model: Business,
+          attributes: [
+            "id",
+            "name",
+            "location_side_id",
+            "in_city",
+            "delivery_charges",
+          ],
+        },
+      ],
     });
     return items;
   }
