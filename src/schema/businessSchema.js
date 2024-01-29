@@ -123,7 +123,7 @@ module.exports = function businessSchema(opts) {
           item_types: Joi.string().required(),
           contact_1: Joi.number().required(),
           contact_2: Joi.number().required(),
-          business_timings: Joi.string().required()
+          business_timings: Joi.string().required(),
         }),
       },
       handler: businessController.joinBusinessRequest,
@@ -170,6 +170,26 @@ module.exports = function businessSchema(opts) {
         await fastify.verifyAdminToken(request, reply);
       },
       handler: businessController.updateBusiness,
+    };
+  };
+  const QuickUpdate = ({ fastify }) => {
+    return {
+      method: "PUT",
+      url: "/business/profile/update/:id",
+      schema: {
+        body: Joi.object().keys({
+          name: Joi.string().required(),
+          image_url: Joi.string().required(),
+          email: Joi.string().allow(null, ""),
+          contact: Joi.number().required(),
+          latitude: Joi.number().required(),
+          longitude: Joi.number().required(),
+        }),
+      },
+      preHandler: async (request, reply) => {
+        await fastify.verifyBusinessToken(request, reply);
+      },
+      handler: businessController.QuickUpdate,
     };
   };
 
@@ -226,6 +246,7 @@ module.exports = function businessSchema(opts) {
     deleteReviewByID,
     searchBusiness,
     searchBusinessByCategory,
-    joinBusinessRequest
+    joinBusinessRequest,
+    QuickUpdate,
   };
 };

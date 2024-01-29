@@ -161,7 +161,7 @@ module.exports = function svcRider(opts) {
   async function getRiderOrders(params) {
     const { id } = params;
 
-    const sql = `SELECT o.id,o.total,o.createdAt,CASE WHEN o.posted_by = 1 THEN 'Client'
+    const sql = `SELECT o.id,o.total,o.rider_accepted_order,o.createdAt,o.order_processing_time,CASE WHEN o.posted_by = 1 THEN 'Client'
     WHEN o.posted_by = 2 THEN 'Admin' ELSE o.posted_by END AS posted_by,o.progress_status,o.address,
     c.name AS city_name,GROUP_CONCAT(oi.item_id) AS item_ids,GROUP_CONCAT(oi.order_item_name) AS item_names,
     GROUP_CONCAT(b.name) AS business_names,r.name AS rider_name 
@@ -172,7 +172,8 @@ module.exports = function svcRider(opts) {
     LEFT JOIN customers AS u ON u.id = o.customer_id 
     LEFT JOIN riders AS r ON r.id = o.rider_id 
     LEFT JOIN cities AS c ON c.id = o.city_id 
-    WHERE o.status = 1 AND o.progress_status != 'pending' AND o.progress_status != 'cancel' AND o.rider_id =${id} GROUP BY o.id`;
+    WHERE o.status = 1 AND o.progress_status != 'pending' AND o.progress_status != 'cancel' AND o.rider_id =${id} GROUP BY o.id,o.progress_status,o.order_processing_time ` +
+      `ORDER BY CASE WHEN progress_status = 'processing' THEN 0 ELSE 1 END,o.order_processing_time DESC`;
 
     const orders = await sequelizeCon.query(sql, {
       type: sequelize.QueryTypes.SELECT,

@@ -54,7 +54,7 @@ module.exports = function svcOrder(opts) {
     const count = await Order.count({
       where: { status: 1 },
     });
-    const sql = `SELECT o.id,o.total,o.createdAt,o.order_processing_time,CASE WHEN o.posted_by = 1 THEN 'Client'
+    const sql = `SELECT o.id,o.total,o.createdAt,o.accepted_order_at,o.rider_accepted_order,o.order_processing_time,CASE WHEN o.posted_by = 1 THEN 'Client'
       WHEN o.posted_by = 2 THEN 'Admin' ELSE o.posted_by END AS posted_by,o.progress_status,o.address,o.delivery_time,
       c.name AS city_name,GROUP_CONCAT(oi.item_id) AS item_ids,GROUP_CONCAT(oi.order_item_profit) AS profits,
       GROUP_CONCAT(oi.order_item_name) AS item_names,SUM(oi.order_item_profit) AS total_profit,
@@ -325,16 +325,11 @@ module.exports = function svcOrder(opts) {
       where: { status: 1 },
     });
     const city = await City.findOne({ attributes: ["name"], where: { id: params.city_id }, raw: true });
-    console.log('====================================');
-    console.log("====== city =====,", city);
-    console.log("====== params =====,", params);
-    console.log('====================================');
     params["city"] = city?.name
     const emailsList = email.map((x) => x.email);
     sendEmail(emailsList, params);
 
-    // if()
-    // await axios.post(`https://secure.h3techs.com/sms/api/send?email=abdurrehman825@gmail.com&key=02760a2ab2a613810cc4e3150d576f2620&mask=AR Services&to=923400576761&message=This is a Test Message`)
+    if (params?.posted_by == 2) sendTextMessage(params);
     return order.id;
   }
 
@@ -441,6 +436,14 @@ module.exports = function svcOrder(opts) {
       item_picked: x?.item_picked,
       picked_at: x?.picked_at ?? "",
     }));
+  }
+
+  async function sendTextMessage(data) {
+    const { total, customer_id } = data;
+    const user = await User.findOne({ where: { id: customer_id }, raw: true });
+    const { contact } = user;
+    const msg = `Your order of total Pkr.${total} has been placed successfully.`
+    await axios.post(`https://secure.h3techs.com/sms/api/send?email=abdurrehman825@gmail.com&key=02760a2ab2a613810cc4e3150d576f2620&to=92${contact}&message=${msg}`)
   }
 
   return {

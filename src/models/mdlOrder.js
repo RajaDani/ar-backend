@@ -71,6 +71,14 @@ module.exports = function mdlUser(opts) {
       type: sequelize.BIGINT,
       allowNull: true,
     },
+    rider_accepted_order: {
+      type: sequelize.BOOLEAN,
+      defaultValue: false,
+    },
+    accepted_order_at: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
     delivery_time: {
       type: sequelize.STRING,
       defaultValue: "30-40 min",
@@ -79,7 +87,7 @@ module.exports = function mdlUser(opts) {
       type: sequelize.BOOLEAN,
       defaultValue: false,
     },
-    hold_order_till:{
+    hold_order_till: {
       type: sequelize.STRING,
       allowNull: true,
     },

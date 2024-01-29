@@ -11,7 +11,8 @@ module.exports = function svcUser(opts) {
     config,
     mdlCity,
     Boom,
-    Op
+    Op,
+    axios
   } = opts;
   const { User } = mdlUser;
   const { Order } = mdlOrder;
@@ -31,6 +32,7 @@ module.exports = function svcUser(opts) {
         "bachat_card_holder",
         "student_card_holder",
         "card_expiry",
+        "city_id"
       ],
       where: {
         status: 1,
@@ -169,7 +171,7 @@ module.exports = function svcUser(opts) {
     delete params["lat"];
     delete params["lng"];
     const count = await User.count({ where: { [Op.or]: [{ email }, { contact }] } });
-    if (count > 0) return { code: 200, msg: "Email or contact already exists!" };
+    if (count > 0) throw Boom.conflict("Email or contact already exists!");
     const pass = await encryption.hashPassword(password, config);
     params["password"] = pass;
 
@@ -194,7 +196,7 @@ module.exports = function svcUser(opts) {
   async function quickAddCustomer(params) {
     const { name, contact, address_details, city_id } = params;
     const count = await User.count({ where: { contact: contact } });
-    if (count > 0) return { code: 200, msg: "User already exists!" };
+    if (count > 0) throw Boom.conflict("Contact already exists!");
 
     const password = Math.random().toString(36).slice(2, 10);
     const pass = await encryption.hashPassword(password, config);
@@ -211,6 +213,8 @@ module.exports = function svcUser(opts) {
         address_details,
         customerId: user.id,
       });
+
+    await sendTextMessage(contact, password);
     return user.id;
   }
 
@@ -285,6 +289,15 @@ module.exports = function svcUser(opts) {
     );
     return user;
   }
+
+  async function sendTextMessage(contact, password) {
+    const msg = `Your account has been created successfully on AR Home Services.%0AHere are your credentials%0A` +
+      `contact: ${contact}%0A` +
+      `password:${password}%0A` +
+      `Don't share your credentials with anyone.`;
+    await axios.post(`https://secure.h3techs.com/sms/api/send?email=abdurrehman825@gmail.com&key=02760a2ab2a613810cc4e3150d576f2620&to=92${contact}&message=${msg}`)
+  }
+
 
   return {
     getCustomers,

@@ -1,6 +1,6 @@
 const fastify = require("fastify");
 // const fastifyJWT = require("@fastify/jwt");
-const fastifyCors = require("@fastify/cors")
+const fastifyCors = require("@fastify/cors");
 const cronjob = require("../scheduler/cron");
 
 const config = require("./config");
@@ -84,7 +84,6 @@ module.exports = async function FastServer(options) {
   };
 
   _server.register(fastifyCors);
-
 
   const start = async function start() {
     try {

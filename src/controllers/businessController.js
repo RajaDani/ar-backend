@@ -56,6 +56,11 @@ module.exports = function businessController(opts) {
     reply.send({ code: 200, reply: record });
   }
 
+  async function QuickUpdate(request, reply) {
+    const { params, body } = request;
+    const record = await svcBusiness.QuickUpdate(params, body);
+    reply.send({ code: 200, reply: record });
+  }
   async function deleteBusinessReview(request, reply) {
     const record = await svcBusiness.deleteBusinessReview(request.params);
     reply.send({ code: 200, reply: record });
@@ -91,6 +96,7 @@ module.exports = function businessController(opts) {
     searchBusinessByCategory,
     deleteBusinessReview,
     readBusinessReview,
-    joinBusinessRequest
+    joinBusinessRequest,
+    QuickUpdate,
   };
 };

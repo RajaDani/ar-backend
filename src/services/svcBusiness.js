@@ -319,7 +319,17 @@ module.exports = function svcBusiness(opts) {
 
     return business;
   }
-
+  async function QuickUpdate(params, data) {
+    const { image_url } = data;
+    if (image_url?.length > 200) {
+      const { secure_url } = await cloudinary.v2.uploader.upload(image_url);
+      data["image_url"] = secure_url;
+    }
+    const business = Business.update(data, {
+      where: { id: params.id },
+    });
+    return business;
+  }
   async function deleteBusinessByID(params) {
     const business = await Business.update(
       {
@@ -447,6 +457,7 @@ module.exports = function svcBusiness(opts) {
     searchBusinessByCategory,
     searchBusiness,
     readBusinessReview,
+    QuickUpdate,
     joinBusinessRequest,
   };
 };

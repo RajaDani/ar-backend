@@ -11,7 +11,7 @@ module.exports = function svcAuth(opts) {
     mdlCustomerAddress,
     mdlRider,
     mdlBusiness,
-    Op
+    Op,
   } = opts;
   const { User } = mdlUser;
   const { Rider } = mdlRider;
@@ -30,7 +30,9 @@ module.exports = function svcAuth(opts) {
       lng,
       city_id,
     } = params;
-    const emailCheck = await User.count({ where: { [Op.or]: [{ email }, { contact }] } });
+    const emailCheck = await User.count({
+      where: { [Op.or]: [{ email }, { contact }] },
+    });
     if (emailCheck > 0) throw Boom.conflict("Email or contact already exists!");
     const pass = encryption.hashPassword(password, config);
     const token = await encryption.generateToken(params);
@@ -114,6 +116,9 @@ module.exports = function svcAuth(opts) {
         name: user.name,
         email: user.email,
         contact: user.contact,
+        contact: user.contact,
+        student_card: user.student_card_holder,
+        bachat_card: user.bachat_card_holder,
         address: user.customer_addresses[0]?.address_details,
       };
   }
@@ -138,6 +143,7 @@ module.exports = function svcAuth(opts) {
         name: rider.name,
         email: rider.email,
         contact: rider.contact,
+
         // address: Rider.customer_addresses[0].address_details,
       };
   }
@@ -162,7 +168,11 @@ module.exports = function svcAuth(opts) {
         name: business.name,
         email: business.email,
         contact: business.contact,
-        role: "business"
+        latitude: business.latitude,
+        longitude: business.longitude,
+        image_url: business.image_url,
+
+        role: "business",
         // address: Rider.customer_addresses[0].address_details,
       };
   }
@@ -187,7 +197,7 @@ module.exports = function svcAuth(opts) {
         modules: admin.modules,
         contact: admin.contact,
         admin_type: admin.admin_type,
-        role: "admin"
+        role: "admin",
       };
       return { msg: "success", data };
     }

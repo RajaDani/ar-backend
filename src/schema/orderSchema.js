@@ -146,7 +146,9 @@ module.exports = function orderSchema(opts) {
           order_processing_time: Joi.number().allow(null, ""),
           order_deliver_time: Joi.number().allow(null, ""),
           admin_edited: Joi.boolean().optional(),
-          hold_order_till: Joi.number().optional().allow(null)
+          hold_order_till: Joi.number().optional().allow(null),
+          rider_accepted_order: Joi.boolean().optional(),
+          accepted_order_at: Joi.string().optional(),
         }),
       },
       preHandler: async (request, reply) => {
@@ -166,6 +168,8 @@ module.exports = function orderSchema(opts) {
           rider_id: Joi.number().allow(null, ""),
           order_processing_time: Joi.number().optional().allow(null, ""),
           order_deliver_time: Joi.number().optional().allow(null, ""),
+          rider_accepted_order: Joi.boolean().optional(),
+          accepted_order_at: Joi.string().optional(),
         }),
       },
       preHandler: async (request, reply) => {
