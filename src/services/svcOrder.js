@@ -16,7 +16,9 @@ module.exports = function svcOrder(opts) {
     config,
     mdlAdmin,
     nodemailer,
-    axios
+    axios,
+    mdlRiderFcm,
+    firebase
   } = opts;
   const { Order } = mdlOrder;
   const { Business } = mdlBusiness;
@@ -28,6 +30,7 @@ module.exports = function svcOrder(opts) {
   const { Area } = mdlArea;
   const { City } = mdlCity;
   const { Admin } = mdlAdmin;
+  const { Rider_Fcm } = mdlRiderFcm
 
   const sendEmail = async (email, orderData) => {
     const smtp = config.get("smtpConfig");
@@ -334,12 +337,15 @@ module.exports = function svcOrder(opts) {
   }
 
   async function updateOrder(params, data) {
+
     const { id } = params;
     const { order_bill_image, item, custom_item } = data;
 
     delete data["order_bill_image"];
     delete data["item"];
     delete data["custom_item"];
+
+    const prevData = await Order.findOne({ where: { id }, raw: true });
 
     if (order_bill_image) {
       const { secure_url } = await cloudinary.v2.uploader.upload(
@@ -393,13 +399,26 @@ module.exports = function svcOrder(opts) {
         ],
       });
     }
+
+    if (prevData.rider_id != data.rider_id) {
+      const fcm_tokens = await Rider_Fcm.findAll({ attributes: ["token"], where: { rider_id: data.rider_id }, raw: true });
+      const tokensList = fcm_tokens.map((x) => x.token);
+      if (tokensList?.length) sendRiderNotification(tokensList)
+    }
+
     return id;
   }
 
   async function quickUpdateOrder(params, body) {
     const { id } = params;
+    const prevData = await Order.findOne({ where: { id }, raw: true });
     const order = await Order.update(body, { where: { id } });
 
+    if (prevData.rider_id != body.rider_id) {
+      const fcm_tokens = await Rider_Fcm.findAll({ attributes: ["token"], where: { rider_id: body.rider_id }, raw: true });
+      const tokensList = fcm_tokens.map((x) => x.token);
+      if (tokensList?.length) sendRiderNotification(tokensList)
+    }
     return order;
   }
 
@@ -445,6 +464,34 @@ module.exports = function svcOrder(opts) {
     const msg = `Your order of total Pkr.${total} has been placed successfully.`
     await axios.post(`https://secure.h3techs.com/sms/api/send?email=abdurrehman825@gmail.com&key=02760a2ab2a613810cc4e3150d576f2620&to=92${contact}&message=${msg}`)
   }
+
+  const sendRiderNotification = async (tokensList) => {
+    const message = {
+      notification: {
+        title: "Order Assigned",
+        body: "A new order is assigned to you by AR Home Services",
+      },
+      tokens: tokensList,
+    };
+
+    return firebase.messaging().sendMulticast(message).then((response) => {
+      if (response.failureCount > 0) {
+        const failedTokens = [];
+        response.responses.forEach((resp, idx) => {
+          if (!resp.success) {
+            failedTokens.push(tokensList[idx]);
+          }
+        });
+        console.log("tokens failed!", failedTokens)
+        // logger.info("Notification failed to send to tokens:", failedTokens);
+      } else {
+        console.log("Notification sent successfully to all tokens.");
+      }
+    })
+      .catch((error) => {
+        console.log("Error sending notification:", error);
+      });
+  };
 
   return {
     getOrders,

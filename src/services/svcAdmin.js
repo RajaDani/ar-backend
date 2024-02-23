@@ -1,9 +1,11 @@
 module.exports = function svcAdmin(opts) {
-  const { sequelizeCon, mdlAdmin, encryption, config, mdlRiderBills, mdlBusiness, mdlRider } = opts;
+  const { sequelizeCon, mdlAdmin, encryption, config, mdlRiderBills, mdlBusiness, mdlRider, mdlUserMembership, mdlUser } = opts;
   const { Admin } = mdlAdmin;
   const { RiderBills } = mdlRiderBills;
   const { Rider } = mdlRider;
   const { Business } = mdlBusiness;
+  const { UserMembership } = mdlUserMembership;
+  const { User } = mdlUser;
 
   async function getAdmins(params) {
     //   Admin.sync({ force: true });
@@ -15,6 +17,8 @@ module.exports = function svcAdmin(opts) {
     });
     return admins;
   }
+
+
 
   async function getAdminByID(params) {
     const admin = await Admin.findOne({

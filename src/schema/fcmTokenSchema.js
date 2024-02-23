@@ -1,3 +1,5 @@
+const { allow } = require("joi");
+
 module.exports = function fcmSchema(opts) {
   const { fcmController, Joi } = opts;
 
@@ -15,7 +17,10 @@ module.exports = function fcmSchema(opts) {
       url: "/fcm/add",
       schema: {
         body: Joi.object().keys({
+          role: Joi.string().required(),
           token: Joi.string().required(),
+          user_id: Joi.number().optional().allow(null, ""),
+          admin_id: Joi.number().optional().allow(null, ""),
         }),
       },
       handler: fcmController.addFcm,

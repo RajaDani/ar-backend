@@ -129,9 +129,8 @@ module.exports = function svcArea(opts) {
   }
 
   async function getMemberships() {
-    Membership.sync();
     return await Membership.findAll({
-      attributes: ["id", "name", "image", "description"],
+      attributes: ["id", "name", "image", "description", "price"],
       where: { status: 1 },
     });
   }

@@ -63,6 +63,11 @@ module.exports = function svcArea(opts) {
         return area
     }
 
+    async function bulkAddArea(params) {
+        const { data } = params;
+        const area = await Area.bulkCreate(data);
+        return area;
+    }
 
     async function addArea(params) {
         const area = await Area.create(params);
@@ -107,6 +112,7 @@ module.exports = function svcArea(opts) {
         getLocationSides,
         getAreaByID,
         getAreaByCity,
+        bulkAddArea,
         addArea,
         addLocationSide,
         updateArea,

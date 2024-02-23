@@ -21,13 +21,17 @@ module.exports = function areaController(opts) {
         reply.send({ code: 200, reply: records });
     }
 
+    async function bulkAddArea(request, reply) {
+        const record = await svcArea.bulkAddArea(request.body);
+        reply.send({ code: 200, reply: record });
+    }
+
     async function addArea(request, reply) {
         const record = await svcArea.addArea(request.body);
         reply.send({ code: 200, reply: record });
     }
 
     async function addLocationSide(request, reply) {
-
         const record = await svcArea.addLocationSide(request.body);
         reply.send({ code: 200, reply: record });
     }
@@ -43,7 +47,7 @@ module.exports = function areaController(opts) {
     }
 
     return {
-        getAreas, getLocationSides, getAreaByID, getAreaByCity,
+        getAreas, getLocationSides, getAreaByID, getAreaByCity, bulkAddArea,
         addArea, addLocationSide, updateArea, deleteAreaByID
     };
 };

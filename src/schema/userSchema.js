@@ -12,6 +12,7 @@ module.exports = function userSchema(opts) {
     };
   };
 
+
   const readAddress = ({ fastify }) => {
     return {
       method: "GET",
@@ -70,10 +71,7 @@ module.exports = function userSchema(opts) {
           address_details: Joi.string().required(),
           lat: Joi.number().optional().allow(null, ""),
           lng: Joi.number().optional().allow(null, ""),
-          city_id: Joi.number().required(),
-          bachat_card_holder: Joi.boolean().optional(),
-          student_card_holder: Joi.boolean().optional(),
-          card_expiry: Joi.number().optional(),
+          city_id: Joi.number().required()
         }),
       },
       preHandler: async (request, reply) => {
@@ -135,10 +133,7 @@ module.exports = function userSchema(opts) {
           address_details: Joi.string().optional().allow(""),
           lat: Joi.number().optional().allow(null, ""),
           lng: Joi.number().optional().allow(null, ""),
-          city_id: Joi.number().required(),
-          bachat_card_holder: Joi.boolean().optional(),
-          student_card_holder: Joi.boolean().optional(),
-          card_expiry: Joi.number().optional(),
+          city_id: Joi.number().required()
         }),
       },
       preHandler: async (request, reply) => {

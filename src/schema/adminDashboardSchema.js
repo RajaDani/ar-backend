@@ -59,6 +59,7 @@ module.exports = function adminDashboardSchema(opts) {
             url: "/admin/update/membership/:id",
             schema: {
                 body: Joi.object().keys({
+                    price: Joi.number().required(),
                     description: Joi.string().required(),
                     image: Joi.string().allow(null, ""),
                 }),

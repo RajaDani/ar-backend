@@ -33,6 +33,22 @@ module.exports = function areaSchema(opts) {
         };
     };
 
+    const bulkAdd = ({ fastify }) => {
+        return {
+            method: "POST",
+            url: "/area/add/bulk",
+            schema: {
+                body: Joi.object().keys({
+                    data: Joi.array().required(),
+                }),
+            },
+            preHandler: async (request, reply) => {
+                await fastify.verifyAdminToken(request, reply);
+            },
+            handler: areaController.bulkAddArea,
+        };
+    };
+
     const add = ({ fastify }) => {
         return {
             method: "POST",
@@ -106,5 +122,5 @@ module.exports = function areaSchema(opts) {
         };
     };
 
-    return { read, readLocationSide, readByID, readByCity, add, addLocationSide, update, deleteByID };
+    return { read, readLocationSide, readByID, readByCity, bulkAdd, add, addLocationSide, update, deleteByID };
 };

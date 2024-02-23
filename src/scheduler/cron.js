@@ -1,9 +1,10 @@
 let CronJob = require("cron").CronJob;
 
 module.exports = async function cron(opts) {
-    const { mdlOrder, Op, mdlUser } = opts;
+    const { mdlOrder, Op, mdlUser, mdlUserMembership } = opts;
     const { Order } = mdlOrder;
     const { User } = mdlUser;
+    const { UserMembership } = mdlUserMembership;
 
     let cronjob = new CronJob(
         "0 */30 * * * *",
@@ -33,19 +34,35 @@ module.exports = async function cron(opts) {
         "0 0 */24 * * *",
         async () => {
             try {
-                let idsToBeUpdate = [];
+                let idsToBeUpdateBachat = [];
+                let idsToBeUpdateStudent = [];
                 const currentTime = new Date().getTime();
                 const users = await User.findAll({
                     where: { [Op.or]: [{ bachat_card_holder: 1 }, { student_card_holder: 1 }] },
                     raw: true
                 })
                 for (let x of users) {
-                    if (currentTime >= x?.card_expiry) idsToBeUpdate.push(x.id);
+                    if (currentTime >= x?.bachat_card_expiry) idsToBeUpdateBachat.push(x.id);
+                    if (currentTime >= x?.student_card_expiry) idsToBeUpdateStudent.push(x.id);
                 }
-                if (idsToBeUpdate?.length) {
+                if (idsToBeUpdateBachat?.length) {
                     await User.update(
-                        { bachat_card_holder: 0, student_card_holder: 0 },
-                        { where: { id: { [Op.in]: idsToBeUpdate } } }
+                        { bachat_card_holder: 0 },
+                        { where: { id: { [Op.in]: idsToBeUpdateBachat } } }
+                    )
+                    await UserMembership.update(
+                        { card_status: "expired" },
+                        { where: { user_id: { [Op.in]: idsToBeUpdateBachat }, card_type: "bachat_card" } }
+                    )
+                }
+                if (idsToBeUpdateStudent?.length) {
+                    await User.update(
+                        { student_card_holder: 0 },
+                        { where: { id: { [Op.in]: idsToBeUpdateStudent } } }
+                    )
+                    await UserMembership.update(
+                        { card_status: "expired" },
+                        { where: { user_id: { [Op.in]: idsToBeUpdateStudent }, card_type: "student_card" } }
                     )
                 }
             } catch (e) {

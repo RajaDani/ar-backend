@@ -1,31 +1,34 @@
-module.exports = function mdlOrderBills(opts) {
-    const { sequelize, sequelizeCon } = opts;
+module.exports = function mdlMembership(opts) {
+  const { sequelize, sequelizeCon } = opts;
 
-    const Membership = sequelizeCon.define("membership", {
-        id: {
-            type: sequelize.INTEGER,
-            autoIncrement: true,
-            allowNull: false,
-            primaryKey: true,
-        },
-        image: {
-            type: sequelize.STRING,
-            allowNull: false
-        },
-        name: {
-            type: sequelize.STRING,
-            allowNull: false
-        },
-        description: {
-            type: sequelize.STRING,
-            allowNull: true
-        },
-        status: {
-            type: sequelize.BOOLEAN,
-            defaultValue: true
-        }
-    });
+  const Membership = sequelizeCon.define("membership", {
+    id: {
+      type: sequelize.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true,
+    },
+    image: {
+      type: sequelize.STRING,
+      allowNull: false,
+    },
+    name: {
+      type: sequelize.STRING,
+      allowNull: false,
+    },
+    price: {
+      type: sequelize.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: sequelize.STRING,
+      allowNull: true,
+    },
+    status: {
+      type: sequelize.BOOLEAN,
+      defaultValue: true,
+    },
+  });
 
-    return { Membership };
+  return { Membership };
 };
-

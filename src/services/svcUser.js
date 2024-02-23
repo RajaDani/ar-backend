@@ -31,7 +31,6 @@ module.exports = function svcUser(opts) {
         "status",
         "bachat_card_holder",
         "student_card_holder",
-        "card_expiry",
         "city_id"
       ],
       where: {
@@ -72,9 +71,6 @@ module.exports = function svcUser(opts) {
         "name",
         "email",
         "contact",
-        "bachat_card_holder",
-        "student_card_holder",
-        "card_expiry",
         "city_id"
       ],
       where: {
@@ -166,7 +162,7 @@ module.exports = function svcUser(opts) {
 
   async function addCustomer(params) {
     // sequelizeCon.sync({ force: true });
-    const { email, password, address_details, lat, lng } = params;
+    const { email, password, address_details, lat, lng, contact } = params;
     delete params["address_details"];
     delete params["lat"];
     delete params["lng"];
