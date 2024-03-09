@@ -49,6 +49,13 @@ module.exports = function customerController(opts) {
     reply.send({ code: 200, reply: record });
   }
 
+
+  async function updateUserInfo(request, reply) {
+    const { params, body } = request;
+    const record = await svcUser.updateUserInfo(params, body);
+    reply.send({ code: 200, reply: record });
+  }
+
   async function updatePassword(request, reply) {
     const { params, body } = request;
     const record = await svcUser.updatePassword(params, body);
@@ -71,6 +78,7 @@ module.exports = function customerController(opts) {
     updatePassword,
     quickAddCustomer,
     updateCustomer,
+    updateUserInfo,
     deleteCustomerByID,
   };
 };

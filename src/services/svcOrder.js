@@ -131,6 +131,7 @@ module.exports = function svcOrder(opts) {
           where: { order_id: params.id },
           include: [
             { model: Item, attributes: ["name", "price", "image_url"] },
+            { model: Business, attributes: ['id', 'name', 'in_city', 'location_side_id', 'delivery_charges'] }
           ],
         },
       ],
@@ -161,6 +162,7 @@ module.exports = function svcOrder(opts) {
           profit: x?.order_item_profit,
           item_picked: x?.item_picked,
           picked_at: x?.picked_at,
+          business: x?.business
         };
       });
       delete orderData["order_items"];

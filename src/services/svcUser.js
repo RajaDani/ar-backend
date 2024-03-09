@@ -105,7 +105,7 @@ module.exports = function svcUser(opts) {
     const { id } = params;
 
     const sql = `SELECT o.id,o.total,o.createdAt,o.progress_status,r.name AS rider_name,
-          r.id AS rider_id,
+          r.id AS rider_id,GROUP_CONCAT(oi.order_item_price) AS item_prices,GROUP_CONCAT(oi.order_item_quantity) AS item_quantity,
         GROUP_CONCAT(oi.item_id) AS item_ids,GROUP_CONCAT(it.name) AS item_names,
         GROUP_CONCAT(b.name) AS business_names 
         FROM orders AS o 
@@ -114,7 +114,7 @@ module.exports = function svcUser(opts) {
         LEFT JOIN businesses AS b ON b.id = it.business_id 
         LEFT JOIN customers AS u ON u.id = o.customer_id 
         LEFT JOIN riders AS r ON r.id = o.rider_id 
-        WHERE o.status = 1 AND o.customer_id =${id} GROUP BY o.id`;
+        WHERE o.status = 1 AND o.customer_id =${id} GROUP BY o.id ORDER BY o.id DESC`;
 
     const orders = await sequelizeCon.query(sql, {
       type: sequelize.QueryTypes.SELECT,
@@ -254,6 +254,23 @@ module.exports = function svcUser(opts) {
     return user;
   }
 
+  async function updateUserInfo(params, data) {
+    if (data?.contact) {
+      const count = await User.count({ where: { contact: data.contact } });
+      if (count > 0) throw Boom.conflict("Contact already exists!");
+    }
+
+    const user = await User.update(data, { where: { id: params.id } });
+
+    if (user)
+      await CustomerAddress.update(
+        { address_details: data.address_details },
+        { where: { customerId: params.id } }
+      );
+
+    return user;
+  }
+
   async function updatePassword(params, body) {
     const { id } = params;
     const { curr_password, new_password } = body;
@@ -306,6 +323,7 @@ module.exports = function svcUser(opts) {
     quickAddCustomer,
     updatePassword,
     updateCustomer,
+    updateUserInfo,
     deleteCustomerByID,
   };
 };

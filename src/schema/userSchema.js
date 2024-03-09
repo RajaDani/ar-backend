@@ -143,6 +143,25 @@ module.exports = function userSchema(opts) {
     };
   };
 
+  const updateUserInfo = ({ fastify }) => {
+    return {
+      method: "PUT",
+      url: "/customer/update/info/:id",
+      schema: {
+        body: Joi.object().keys({
+          name: Joi.string().required(),
+          email: Joi.string().optional(),
+          contact: Joi.number().optional(),
+          address_details: Joi.string().optional().allow("")
+        }),
+      },
+      preHandler: async (request, reply) => {
+        await fastify.verifyToken(request, reply);
+      },
+      handler: userController.updateUserInfo,
+    };
+  };
+
   const updatePassword = ({ fastify }) => {
     return {
       method: "PUT",
@@ -173,7 +192,7 @@ module.exports = function userSchema(opts) {
   };
 
   return {
-    read, readAddress, readByID, getUserOrders,
+    read, readAddress, readByID, getUserOrders, updateUserInfo,
     getUserAppointments, add, addAddress, quickAdd, update, updatePassword, deleteByID
   };
 };

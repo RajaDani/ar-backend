@@ -1,5 +1,5 @@
 module.exports = function svcAdmin(opts) {
-  const { sequelizeCon, mdlAdmin, encryption, config, mdlRiderBills, mdlBusiness, mdlRider, mdlUserMembership, mdlUser } = opts;
+  const { sequelizeCon, mdlAdmin, encryption, config, mdlRiderBills, mdlBusiness, mdlRider, mdlUserMembership, mdlUser, Boom } = opts;
   const { Admin } = mdlAdmin;
   const { RiderBills } = mdlRiderBills;
   const { Rider } = mdlRider;
@@ -17,8 +17,6 @@ module.exports = function svcAdmin(opts) {
     });
     return admins;
   }
-
-
 
   async function getAdminByID(params) {
     const admin = await Admin.findOne({
@@ -65,7 +63,7 @@ module.exports = function svcAdmin(opts) {
 
     if (identity.admin_type !== 1) return "You are not Super Admin!";
     const count = await Admin.count({ where: { email: email } });
-    if (count > 0) return "Email already exists!";
+    if (count > 0) throw Boom.conflict("Contact already exists!");
 
     const pass = encryption.hashPassword(password, config);
     const token = await encryption.generateToken(params);
@@ -85,7 +83,7 @@ module.exports = function svcAdmin(opts) {
   }
 
   async function updateAdmin(params, data, identity) {
-    if (identity.admin_type !== 1) return "You are not Super Admin!";
+    if (identity.admin_type !== 1) throw Boom.conflict("You are not Super Admin!")
     const admin = await Admin.update(
       data,
       {
