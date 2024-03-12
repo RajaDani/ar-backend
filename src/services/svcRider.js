@@ -222,6 +222,7 @@ module.exports = function svcRider(opts) {
       if (!riderOrders?.length) {
         riderOrders = [{
           rider_name: x.name, total_profit: 0,
+          job_start_time: x.job_start_time,
           rider_job_start: x?.rider_job_start, rider_job_end: x?.rider_job_end, total_orders: 0
         }]
       }

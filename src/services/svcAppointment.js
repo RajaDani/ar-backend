@@ -32,6 +32,7 @@ module.exports = function svcAppointment(opts) {
             where: {
                 status: 1,
             },
+            order: [['id', 'DESC']],
         });
         return appointments;
     }
@@ -39,7 +40,7 @@ module.exports = function svcAppointment(opts) {
     async function getAppointmentByID(params) {
         const appointment = await Appointment.findOne({
             attributes: ["id", "app_holder_name", "app_holder_address", "appointment_type", "appointment_fee", "platform_fee", "appointment_date", "appointment_time",
-                "appointment_progress", "payment_method", "customer_id", "address", "item_id"],
+                "appointment_progress", "payment_method", "customer_id", "item_id"],
             where: {
                 id: params.id,
             },

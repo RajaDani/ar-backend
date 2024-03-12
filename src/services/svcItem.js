@@ -277,6 +277,9 @@ module.exports = function svcItem(opts) {
             "in_city",
             "location_side_id",
             "delivery_charges",
+            "start_time",
+            "end_time",
+            "off_days"
           ],
         },
       ],

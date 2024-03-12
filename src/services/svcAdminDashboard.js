@@ -1,4 +1,4 @@
-module.exports = function svcArea(opts) {
+module.exports = function svcAdminDashboard(opts) {
   const {
     sequelize,
     sequelizeCon,
@@ -11,6 +11,7 @@ module.exports = function svcArea(opts) {
     mdlRider,
     mdlServiceTime,
     mdlMembership,
+    mdlOrderItems
   } = opts;
   const { Order } = mdlOrder;
   const { Item } = mdlItem;
@@ -19,6 +20,7 @@ module.exports = function svcArea(opts) {
   const { Rider } = mdlRider;
   const { ServiceTime } = mdlServiceTime;
   const { Membership } = mdlMembership;
+  const { OrderItem } = mdlOrderItems;
 
   async function getDashboardAnalytics() {
     const orders = await Order.findOne({
@@ -27,15 +29,23 @@ module.exports = function svcArea(opts) {
           sequelize.fn("SUM", sequelize.col("delivery_charges")),
           "delivery_earnings",
         ],
-        [sequelize.fn("SUM", sequelize.col("profit")), "order_profit"],
         [sequelize.fn("COUNT", sequelize.col("id")), "total_orders"],
       ],
+      raw: true
     });
 
+    console.log("orders", orders)
+    const profit = await OrderItem.findOne({
+      attributes: [[sequelize.fn("SUM", sequelize.col("order_item_profit")), "order_profit"]],
+      raw: true
+    })
+
+    let orderData = { ...orders };
+    orderData["order_profit"] = profit?.order_profit;
     const items = await Item.findOne({
       attributes: [[sequelize.fn("COUNT", sequelize.col("id")), "total_items"]],
     });
-    const data = { orders, items };
+    const data = { orders: orderData, items };
     return data;
   }
 

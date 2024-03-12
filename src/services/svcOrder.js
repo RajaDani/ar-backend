@@ -262,7 +262,7 @@ module.exports = function svcOrder(opts) {
     const condition = whereClause.slice(0, whereClause.length - 4);
 
     const sql = `SELECT o.id,o.total,o.createdAt,CASE WHEN o.posted_by = 1 THEN 'Client'
-      WHEN o.posted_by = 2 THEN 'Admin' ELSE o.posted_by END AS posted_by,o.progress_status,o.address,o.admin_edited,
+      WHEN o.posted_by = 2 THEN 'Admin' ELSE o.posted_by END AS posted_by,o.progress_status,o.address,o.admin_edited,o.delivery_charges,
       o.order_processing_time,o.order_deliver_time,o.delivery_time,GROUP_CONCAT(oi.item_id) AS item_ids,
       GROUP_CONCAT(it.name) AS item_names,c.name AS city_name,
       GROUP_CONCAT(oi.order_item_profit) AS profits,SUM(oi.order_item_profit) AS total_profit,
@@ -416,10 +416,12 @@ module.exports = function svcOrder(opts) {
     const prevData = await Order.findOne({ where: { id }, raw: true });
     const order = await Order.update(body, { where: { id } });
 
-    if (prevData.rider_id != body.rider_id) {
-      const fcm_tokens = await Rider_Fcm.findAll({ attributes: ["token"], where: { rider_id: body.rider_id }, raw: true });
-      const tokensList = fcm_tokens.map((x) => x.token);
-      if (tokensList?.length) sendRiderNotification(tokensList)
+    if (body?.rider_id) {
+      if (prevData.rider_id != body.rider_id) {
+        const fcm_tokens = await Rider_Fcm.findAll({ attributes: ["token"], where: { rider_id: body.rider_id }, raw: true });
+        const tokensList = fcm_tokens.map((x) => x.token);
+        if (tokensList?.length) sendRiderNotification(tokensList)
+      }
     }
     return order;
   }
