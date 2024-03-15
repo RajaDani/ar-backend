@@ -1,10 +1,12 @@
 let CronJob = require("cron").CronJob;
 
 module.exports = async function cron(opts) {
-    const { mdlOrder, Op, mdlUser, mdlUserMembership } = opts;
+    const { mdlOrder, Op, mdlUser, mdlUserMembership, mdlServiceTime, mdlRider } = opts;
     const { Order } = mdlOrder;
     const { User } = mdlUser;
     const { UserMembership } = mdlUserMembership;
+    const { ServiceTime } = mdlServiceTime;
+    const { Rider } = mdlRider;
 
     let cronjob = new CronJob(
         "0 */30 * * * *",
@@ -72,4 +74,8 @@ module.exports = async function cron(opts) {
         null,
         true
     );
+
+    let riderStatusChange = new CronJob('59 6 * * *', async () => {
+        await Rider.update({ active: 0 }, { where: { status: 1 } })
+    }, null, true)
 }

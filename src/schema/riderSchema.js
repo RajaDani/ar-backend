@@ -26,7 +26,7 @@ module.exports = function riderSchema(opts) {
   const readRiderStats = ({ fastify }) => {
     return {
       method: "GET",
-      url: "/rider/read/stats/:id",
+      url: "/rider/read/stats/:id/:createdAt",
       preHandler: async (request, reply) => {
         await fastify.verifyAdminToken(request, reply);
       },
@@ -158,7 +158,7 @@ module.exports = function riderSchema(opts) {
         body: Joi.object().keys({
           rider_job_start: Joi.number().optional().allow(null, ""),
           rider_job_end: Joi.number().optional().allow(null, ""),
-          rider_job_status: Joi.boolean().optional().allow(null, ""),
+          active: Joi.boolean().optional().allow(null, ""),
         }),
       },
       preHandler: async (request, reply) => {

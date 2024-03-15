@@ -1,4 +1,4 @@
-module.exports = function areaController(opts) {
+module.exports = function adminDashboardController(opts) {
     const { svcAdminDashboard } = opts;
 
     async function getDashboardAnalytics(request, reply) {

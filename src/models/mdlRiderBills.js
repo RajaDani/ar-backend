@@ -1,4 +1,4 @@
-module.exports = function mdlOrderBills(opts) {
+module.exports = function mdlRiderBills(opts) {
     const { sequelize, sequelizeCon, mdlRider, mdlBusiness } = opts;
 
     const { Rider } = mdlRider;
@@ -19,11 +19,11 @@ module.exports = function mdlOrderBills(opts) {
             type: sequelize.STRING,
             allowNull: false
         },
-        total_amount : {
+        total_amount: {
             type: sequelize.INTEGER,
             allowNull: false
         },
-        bill_id : {
+        bill_id: {
             type: sequelize.STRING,
             allowNull: true
         },

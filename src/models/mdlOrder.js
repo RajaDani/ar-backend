@@ -1,4 +1,4 @@
-module.exports = function mdlUser(opts) {
+module.exports = function mdlOrder(opts) {
   const { sequelize, sequelizeCon, mdlUser, mdlRider, mdlCustomerAddress, mdlArea, mdlCoupon, mdlCity } =
     opts;
   const { User } = mdlUser;

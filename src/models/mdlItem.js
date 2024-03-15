@@ -1,6 +1,6 @@
 const { Sequelize } = require("sequelize");
 
-module.exports = function mdlUser(opts) {
+module.exports = function mdlItem(opts) {
   const { sequelize, sequelizeCon, mdlSubcategory, mdlBusiness, mdlAdmin } =
     opts;
   const { Subcategory } = mdlSubcategory;

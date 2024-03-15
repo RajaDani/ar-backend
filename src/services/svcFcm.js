@@ -1,4 +1,4 @@
-module.exports = function svcCity(opts) {
+module.exports = function svcFcm(opts) {
   const { sequelizeCon, mdlFcm } = opts;
   const { FCM } = mdlFcm;
 

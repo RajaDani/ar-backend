@@ -1,4 +1,4 @@
-module.exports = function mdlCity(opts) {
+module.exports = function mdlBusinessCategory(opts) {
     const { sequelize, sequelizeCon, mdlCategory, mdlBusiness } = opts;
 
     const { Business } = mdlBusiness;

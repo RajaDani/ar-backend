@@ -1,4 +1,4 @@
-module.exports = function mdlRider(opts) {
+module.exports = function mdlRiderLocation(opts) {
   const { sequelize, sequelizeCon, mdlRider } = opts;
 
   const { Rider } = mdlRider;

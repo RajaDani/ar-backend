@@ -408,6 +408,10 @@ module.exports = function svcOrder(opts) {
       if (tokensList?.length) sendRiderNotification(tokensList)
     }
 
+    if (prevData.progress_status != data.progress_status) {
+      if (data.progress_status === "on the way") onTheWayMessage(data);
+    }
+
     return id;
   }
 
@@ -422,6 +426,10 @@ module.exports = function svcOrder(opts) {
         const tokensList = fcm_tokens.map((x) => x.token);
         if (tokensList?.length) sendRiderNotification(tokensList)
       }
+    }
+
+    if (prevData.progress_status != body?.progress_status) {
+      if (body?.progress_status === "on the way") onTheWayMessage(prevData);
     }
     return order;
   }
@@ -466,7 +474,15 @@ module.exports = function svcOrder(opts) {
     const user = await User.findOne({ where: { id: customer_id }, raw: true });
     const { contact } = user;
     const msg = `Your order of total Pkr.${total} has been placed successfully.`
-    await axios.post(`https://secure.h3techs.com/sms/api/send?email=abdurrehman825@gmail.com&key=02760a2ab2a613810cc4e3150d576f2620&to=92${contact}&message=${msg}`)
+    await axios.post(`https://secure.h3techs.com/sms/api/send?email=abdurrehman825@gmail.com&mask=AR Services&key=02760a2ab2a613810cc4e3150d576f2620&to=92${contact}&message=${msg}`)
+  }
+
+  async function onTheWayMessage(data) {
+    const { total, customer_id } = data;
+    const user = await User.findOne({ where: { id: customer_id }, raw: true });
+    const { contact } = user;
+    const msg = `Your order of total Pkr.${total} in on the way.`
+    await axios.post(`https://secure.h3techs.com/sms/api/send?email=abdurrehman825@gmail.com&mask=AR Services&key=02760a2ab2a613810cc4e3150d576f2620&to=92${contact}&message=${msg}`)
   }
 
   const sendRiderNotification = async (tokensList) => {

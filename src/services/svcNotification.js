@@ -1,4 +1,4 @@
-module.exports = function svcCity(opts) {
+module.exports = function svcNotification(opts) {
     const { sequelizeCon, mdlFcm, firebase, cloudinary } = opts;
 
     const { FCM } = mdlFcm;

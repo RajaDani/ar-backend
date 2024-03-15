@@ -46,6 +46,8 @@ module.exports = function svcBusiness(opts) {
         "in_city",
         "discount_alloted",
         "youtube_link",
+        "start_time",
+        "end_time",
         [
           sequelize.literal(
             "(SELECT COUNT(DISTINCT `order_id`) FROM `order_items` WHERE `order_items`.`business_id` = `business`.`id`)"

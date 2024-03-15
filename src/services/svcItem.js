@@ -26,7 +26,14 @@ module.exports = function svcItem(opts) {
       include: [
         {
           model: Business,
-          attributes: ["name"],
+          attributes: [  "id",
+          "name",
+          "in_city",
+          "location_side_id",
+          "delivery_charges",
+          "start_time",
+          "end_time",
+          "off_days"],
         },
         {
           model: Subcategory,
@@ -71,8 +78,14 @@ module.exports = function svcItem(opts) {
       include: [
         {
           model: Business,
-          attributes: ["name"],
-        },
+          attributes: [  "id",
+          "name",
+          "in_city",
+          "location_side_id",
+          "delivery_charges",
+          "start_time",
+          "end_time",
+          "off_days"],        },
         {
           model: Subcategory,
           attributes: ["name"],
@@ -119,13 +132,14 @@ module.exports = function svcItem(opts) {
       include: [
         {
           model: Business,
-          attributes: [
-            "id",
-            "name",
-            "location_side_id",
-            "in_city",
-            "delivery_charges",
-          ],
+          attributes: [  "id",
+          "name",
+          "in_city",
+          "location_side_id",
+          "delivery_charges",
+          "start_time",
+          "end_time",
+          "off_days"],
         },
         {
           model: Subcategory,
@@ -160,13 +174,14 @@ module.exports = function svcItem(opts) {
       include: [
         {
           model: Business,
-          attributes: [
-            "id",
-            "name",
-            "location_side_id",
-            "in_city",
-            "delivery_charges",
-          ],
+          attributes: [  "id",
+          "name",
+          "in_city",
+          "location_side_id",
+          "delivery_charges",
+          "start_time",
+          "end_time",
+          "off_days"],
         },
       ],
     });
@@ -197,13 +212,14 @@ module.exports = function svcItem(opts) {
       include: [
         {
           model: Business,
-          attributes: [
-            "id",
-            "name",
-            "location_side_id",
-            "in_city",
-            "delivery_charges",
-          ],
+          attributes: [  "id",
+          "name",
+          "in_city",
+          "location_side_id",
+          "delivery_charges",
+          "start_time",
+          "end_time",
+          "off_days"],
         },
       ],
     });
@@ -274,6 +290,8 @@ module.exports = function svcItem(opts) {
           attributes: [
             "id",
             "name",
+            "rating",
+
             "in_city",
             "location_side_id",
             "delivery_charges",
@@ -372,9 +390,14 @@ module.exports = function svcItem(opts) {
           attributes: [
             "id",
             "name",
+            "rating",
+
             "in_city",
             "location_side_id",
             "delivery_charges",
+            "start_time",
+            "end_time",
+            "off_days"
           ],
         },
       ],

@@ -11,13 +11,16 @@ module.exports = function svcRider(opts) {
     mdlCity,
     mdlRiderReview,
     mdlRiderBills,
-    mdlUser
+    mdlUser,
+    mdlRiderHistory,
+    Op
   } = opts;
   const { Rider } = mdlRider;
   const { City } = mdlCity;
   const { RiderReview } = mdlRiderReview;
   const { RiderBills } = mdlRiderBills;
   const { User } = mdlUser;
+  const { RiderHistory } = mdlRiderHistory;
 
   async function getRiders(params) {
     // sequelizeCon.sync({ force: true });
@@ -136,12 +139,17 @@ module.exports = function svcRider(opts) {
   async function updateRiderStatus(params, data) {
     const { id } = params;
 
-    const rider = await Rider.update(data, {
-      where: {
-        id,
-      },
-    });
+    if (data?.rider_job_start) {
+      await RiderHistory.create({ start_time: data.rider_job_start, rider_id: id })
+    }
+    if (data?.rider_job_end) {
+      const maxIdRow = await RiderHistory.findOne({ attributes: [[sequelize.fn('MAX', sequelize.col('id')), 'max_id']], raw: true });
+      if (maxIdRow.max_id) {
+        await RiderHistory.update({ end_time: data?.rider_job_end }, { where: { id: maxIdRow.max_id } })
+      }
+    }
 
+    const rider = await Rider.update(data, { where: { id }, });
     return rider;
   }
 
@@ -172,7 +180,7 @@ module.exports = function svcRider(opts) {
     LEFT JOIN customers AS u ON u.id = o.customer_id 
     LEFT JOIN riders AS r ON r.id = o.rider_id 
     LEFT JOIN cities AS c ON c.id = o.city_id 
-    WHERE o.status = 1 AND o.progress_status != 'pending' AND o.progress_status != 'cancel' AND o.rider_id =${id} GROUP BY o.id,o.progress_status,o.order_processing_time ` +
+    WHERE o.status = 1 AND o.progress_status != 'pending' AND o.progress_status != 'cancel' AND o.progress_status != 'delivered' AND o.rider_id =${id} GROUP BY o.id,o.progress_status,o.order_processing_time ` +
       `ORDER BY CASE WHEN progress_status = 'processing' THEN 0 ELSE 1 END,o.order_processing_time DESC`;
 
     const orders = await sequelizeCon.query(sql, {
@@ -183,17 +191,22 @@ module.exports = function svcRider(opts) {
   }
 
   async function getRiderStats(params) {
-    const { id } = params;
-    const details = await Rider.findOne({
-      attributes: ["id", "name", "contact", "job_type", "job_start_time", "job_end_time", "off_days", "rider_job_start", "rider_job_end"],
-      include: [{
-        model: City,
-        attributes: ["name"]
-      }],
-      where: { id }
-    })
+    const { id, createdAt } = params;
 
-    return details;
+    const sql = `SELECT r.name,r.contact,r.off_days,r.job_start_time,r.job_end_time,r.job_type,` +
+      `SUM(CASE WHEN rh.createdAt >= '${createdAt + " 00:00:00"}' AND rh.createdAt < '${createdAt + " 23:59:59"}' THEN rh.start_time ELSE 0 END) AS start_time,` +
+      `SUM(CASE WHEN rh.createdAt >= '${createdAt + " 00:00:00"}' AND rh.createdAt < '${createdAt + " 23:59:59"}' THEN rh.end_time ELSE 0 END) AS end_time,` +
+      `c.name AS city_name FROM riders AS r ` +
+      `LEFT JOIN rider_histories AS rh on rh.rider_id = ${id} ` +
+      `LEFT JOIN cities AS c on c.id = r.city_id ` +
+      `WHERE r.id = ${id} `
+
+    const details = await sequelizeCon.query(sql, {
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    return details[0];
+
   }
 
   async function getRiderDailyOrderList(riderList, formatTodayDate, formatNextDate) {
@@ -211,7 +224,7 @@ module.exports = function svcRider(opts) {
         `LEFT JOIN riders AS r ON r.id = o.rider_id ` +
         `LEFT JOIN cities AS c ON c.id = o.city_id ` +
         `LEFT JOIN areas AS a ON a.id = o.area_id ` +
-        `WHERE o.status = 1 AND o.rider_id =${x.id} AND o.createdAt >= '${formatTodayDate}' ` +
+        `WHERE r.active = 1 AND o.status = 1 AND o.rider_id =${x.id} AND o.createdAt >= '${formatTodayDate}' ` +
         `AND o.progress_status != 'pending' AND o.createdAt < '${formatNextDate}' GROUP BY o.id DESC LIMIT 5 ; `;
 
       let riderOrders = await sequelizeCon.query(query, {
@@ -226,16 +239,17 @@ module.exports = function svcRider(opts) {
           rider_job_start: x?.rider_job_start, rider_job_end: x?.rider_job_end, total_orders: 0
         }]
       }
-
       return riderOrders;
     });
-    const riderData = await Promise.all(promises);
+
+    let riderData = await Promise.all(promises);
+    riderData = riderData.filter(value => value !== null && value !== undefined);
     return riderData;
   }
 
   async function getIndividualRidersOrders() {
     const riders = await Rider.findAll({
-      where: { status: 1 },
+      where: { status: 1, active: 1 },
       raw: true
     })
 
@@ -249,9 +263,7 @@ module.exports = function svcRider(opts) {
     const formatNextDate = nextDay.toISOString().split('T')[0];
 
     if (riders) {
-      const riderList = riders.filter((x) => !x.off_days.includes(dayName));
-      let riderData = await getRiderDailyOrderList(riderList, formatTodayDate, formatNextDate);
-
+      let riderData = await getRiderDailyOrderList(riders, formatTodayDate, formatNextDate);
       return riderData;
     }
   }

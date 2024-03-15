@@ -1,4 +1,4 @@
-module.exports = function mdlUser(opts) {
+module.exports = function mdlCoupon(opts) {
   const { sequelize, sequelizeCon, mdlAdmin } = opts;
   const { Admin } = mdlAdmin;
 

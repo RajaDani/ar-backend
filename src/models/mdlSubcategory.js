@@ -1,4 +1,4 @@
-module.exports = function mdlUser(opts) {
+module.exports = function mdlSubcategory(opts) {
   const { sequelize, sequelizeCon, mdlCategory } = opts;
 
   const { Category } = mdlCategory;

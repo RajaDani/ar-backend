@@ -1,4 +1,4 @@
-module.exports = function userSchema(opts) {
+module.exports = function authSchema(opts) {
   const { authController, Joi } = opts;
 
   const login = ({ fastify }) => {

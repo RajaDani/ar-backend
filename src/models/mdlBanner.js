@@ -1,4 +1,4 @@
-module.exports = function mdlUser(opts) {
+module.exports = function mdlArea(opts) {
   const { sequelize, sequelizeCon } = opts;
 
   const Banner = sequelizeCon.define("banner", {

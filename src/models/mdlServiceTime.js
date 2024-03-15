@@ -1,4 +1,4 @@
-module.exports = function mdlCity(opts) {
+module.exports = function mdlServiceTime(opts) {
   const { sequelize, sequelizeCon } = opts;
 
   const ServiceTime = sequelizeCon.define("service_time", {

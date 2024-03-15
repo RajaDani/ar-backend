@@ -1,4 +1,4 @@
-module.exports = function areaController(opts) {
+module.exports = function imageUploadController(opts) {
     const { svcImageUpload } = opts;
 
     async function uploadImage(request, reply) {

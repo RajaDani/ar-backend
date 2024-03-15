@@ -1,4 +1,4 @@
-module.exports = function svcRider(opts) {
+module.exports = function svcJobApplicant(opts) {
   const { mdlJobs, cloudinary, Boom } = opts;
   const { JobsApplications } = mdlJobs;
 

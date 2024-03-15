@@ -1,4 +1,4 @@
-module.exports = function mdlUser(opts) {
+module.exports = function mdlItemRating(opts) {
   const { sequelize, sequelizeCon, mdlUser, mdlItem } = opts;
   const { User } = mdlUser;
   const { Item } = mdlItem;

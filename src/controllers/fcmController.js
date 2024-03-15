@@ -1,4 +1,4 @@
-module.exports = function cityController(opts) {
+module.exports = function fcmController(opts) {
   const { svcFcm } = opts;
 
   async function getFcm(request, reply) {
