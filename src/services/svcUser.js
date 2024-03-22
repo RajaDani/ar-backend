@@ -126,7 +126,7 @@ module.exports = function svcUser(opts) {
     for (let order of orders) {
       if (
         order.progress_status == "cancelled" ||
-        order.progress_status == "completed"
+        order.progress_status == "delivered"
       ) {
         past_orders.push(order);
       } else current_orders.push(order);

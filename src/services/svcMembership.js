@@ -26,8 +26,8 @@ module.exports = function svcMembership(opts) {
     async function addMembership(body) {
         const count = await UserMembership.count({
             where: {
-                [Op.or]: [{ user_id: body.user_id },
-                { card_type: body.card_type }, { card_status: "expired" }]
+                [Op.and]: [{ user_id: body.user_id },
+                { card_type: body.card_type }]
             }
         })
         if (count > 0) throw Boom.conflict("You request is already in progress!");;
